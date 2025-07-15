@@ -28,6 +28,18 @@
    make install
    ```
 
+5. **⚠️ IMPORTANT: Recreate both databases to ensure proper environment setup:**
+   ```bash
+   make db-recreate-all
+   ```
+   This step is **required** for both development and test environments to work properly.
+
+6. **Verify quality pipeline:**
+   ```bash
+   make quality-pipeline
+   ```
+   This runs all code quality checks (PHP CS Fixer, Psalm, PHPStan, PHPMD, PHPCPD, PHPUnit).
+
 ### Access Points
 
 - **Main Application:** http://localhost:8080
@@ -40,12 +52,28 @@
 - **`make shell`** - Enter application shell
 - **`make test`** - Run all tests
 - **`make quality-pipeline`** - Run code quality checks
+- **`make db-recreate-all`** - Recreate both development and test databases
+
+### Quality Pipeline Components
+
+The quality pipeline includes:
+- **PHP CS Fixer** - Code formatting (safe configuration, no backslash addition)
+- **Psalm** - Static analysis with type checking
+- **PHPStan** - Static analysis for error detection
+- **PHPMD** - Code smell detection
+- **PHPCPD** - Duplicate code detection
+- **PHPUnit** - Unit and integration tests
 
 ### Troubleshooting
 
 If you encounter port conflicts, the application uses:
 - **MySQL:** Port 3307 (instead of default 3306)
 - **Redis:** Port 6380 (instead of default 6379)
+
+**If quality pipeline fails:**
+1. Ensure databases are recreated: `make db-recreate-all`
+2. Check for missing imports in PHP files
+3. Verify all tests pass: `make test`
 
 ---
 
