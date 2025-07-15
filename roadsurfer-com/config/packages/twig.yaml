@@ -1,0 +1,8 @@
+twig:
+    default_path: '%kernel.project_dir%/src/Presentation/Template'
+    paths:
+        - '%kernel.project_dir%/vendor/nelmio/api-doc-bundle/templates'
+
+when@test:
+    twig:
+        strict_variables: true

@@ -1,0 +1,142 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.3.0",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^2.0",
+        "doctrine/doctrine-migrations-bundle": "^3.0",
+        "doctrine/orm": "^2.0",
+        "nelmio/api-doc-bundle": "^4.8",
+        "symfony/asset": "7.0.*",
+        "symfony/console": "^7.0",
+        "symfony/dotenv": "^7.0",
+        "symfony/flex": "^1.20",
+        "symfony/framework-bundle": "^7.0",
+        "symfony/messenger": "^7.0",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/runtime": "^7.0",
+        "symfony/security-bundle": "^7.0",
+        "symfony/serializer": "^7.0",
+        "symfony/twig-bundle": "7.0.*",
+        "symfony/validator": "^7.0",
+        "symfony/yaml": "^7.0",
+        "zircote/swagger-php": "^4.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "symfony/browser-kit": "^7.0",
+        "symfony/css-selector": "^7.0",
+        "symfony/maker-bundle": "^1.50",
+        "symfony/phpunit-bridge": "^7.0",
+        "vimeo/psalm": "^5.0",
+        "phpstan/phpstan": "^1.10",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpmd/phpmd": "^2.15",
+        "sebastian/phpcpd": "^6.0",
+        "phpmetrics/phpmetrics": "^2.8",
+        "composer/xdebug-handler": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        },
+        "classmap": [
+            "src/"
+        ],
+        "exclude-from-classmap": [
+            "src/Tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts",
+            "php bin/console cache:clear",
+            "composer dump-autoload --optimize"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts",
+            "php bin/console cache:clear",
+            "composer dump-autoload --optimize"
+        ],
+        "quality": [
+            "php-cs-fixer fix",
+            "psalm",
+            "phpstan analyse",
+            "phpmd src text phpmd.xml",
+            "phpcpd src",
+            "phpunit"
+        ],
+        "quality-check": [
+            "psalm",
+            "phpstan analyse",
+            "phpmd src text phpmd.xml"
+        ],
+        "format": [
+            "php-cs-fixer fix"
+        ],
+        "optimize": [
+            "composer dump-autoload --optimize --classmap-authoritative"
+        ],
+        "quality-optimize": [
+            "composer dump-autoload --optimize",
+            "psalm --no-cache --no-progress",
+            "phpstan analyse --no-progress",
+            "php-cs-fixer fix"
+        ],
+        "cache-clear": [
+            "php bin/console cache:clear --no-warmup"
+        ],
+        "cache-warmup": [
+            "php bin/console cache:warmup"
+        ],
+        "quality-pipeline": [
+            "composer run-script format",
+            "composer run-script quality-optimize",
+            "phpmd src text phpmd.xml --strict",
+            "phpcpd src",
+            "phpunit"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "7.0.*"
+        }
+    }
+}

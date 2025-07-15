@@ -1,0 +1,92 @@
+services:
+  # PHP-FPM Service
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roadster_php
+    volumes:
+      - ../roadsurfer-com:/var/www
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
+    environment:
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - DATABASE_URL=mysql://root:root@mysql:3306/roadster?serverVersion=8.0&charset=utf8mb4
+      - TEST_DATABASE_URL=mysql://root:root@mysql:3306/roadster_test?serverVersion=8.0&charset=utf8mb4
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - APP_SECRET=your_secret_key_here_change_this_in_production
+      - TEST_APP_ENV=test
+      - TEST_APP_SECRET=test_secret_key_for_testing_environment
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - roadster_network
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: roadster_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ../roadsurfer-com:/var/www
+      - ../roadsurfer-com/vendor:/var/www/vendor
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - roadster_network
+    depends_on:
+      - php
+
+  # MySQL Database (Optional)
+  mysql:
+    image: mysql:8.0
+    container_name: roadster_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: roadster
+      MYSQL_USER: roadster
+      MYSQL_PASSWORD: roadster
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - roadster_network
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:alpine
+    container_name: roadster_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - roadster_network
+
+  # PHPMyAdmin (Optional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: roadster_phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    networks:
+      - roadster_network
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  roadster_network:
+    driver: bridge 

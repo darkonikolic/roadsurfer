@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadster Application</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 50px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .status {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            border: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: white;
+            font-weight: bold;
+        }
+        .info {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: white;
+        }
+        .links {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .links a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .links a.health {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+        }
+        .links a.admin {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+        }
+        .architecture {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .architecture h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .architecture ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .architecture li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ message }}</h1>
+        
+        <div class="status">
+            <strong>🚀 Application Status:</strong> Running Successfully
+        </div>
+        
+        <div class="info">
+            <strong>Environment:</strong> {{ environment }}<br>
+            <strong>Timestamp:</strong> {{ timestamp }}
+        </div>
+
+        <div class="architecture">
+            <h3>🏗️ Clean Architecture Implementation</h3>
+            <ul>
+                <li><strong>Application Layer:</strong> Use cases and orchestration</li>
+                <li><strong>Domain Layer:</strong> Business logic and rules</li>
+                <li><strong>Infrastructure Layer:</strong> External concerns (database, APIs)</li>
+                <li><strong>Presentation Layer:</strong> HTTP handling and controllers</li>
+                <li><strong>Shared Layer:</strong> DTOs and common utilities</li>
+            </ul>
+        </div>
+        
+        <div class="links">
+            <a href="/health" class="health">🏥 Health Check</a>
+            <a href="/api/doc" target="_blank" class="admin">📚 API Documentation</a>
+            <a href="/api/doc.json" target="_blank" class="admin">🔗 API JSON Schema</a>
+            <a href="http://localhost:8081" target="_blank" class="admin">🗄️ PHPMyAdmin</a>
+        </div>
+    </div>
+</body>
+</html> 

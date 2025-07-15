@@ -1,0 +1,14 @@
+parameters:
+    level: 6
+    phpVersion: 80300
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
+    ignoreErrors:
+        - '#readonly#'
+        - '#ParseError#'
+        - '#Too few arguments to function PHPStan\\PhpDocParser\\Parser\\ConstExprParser::__construct#'
+        - '#PropertyInfo\\Extractor\\PhpStanExtractor#'

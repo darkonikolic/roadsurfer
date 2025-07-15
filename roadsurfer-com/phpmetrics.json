@@ -1,0 +1,16 @@
+{
+    "git": {
+        "repository": "."
+    },
+    "plugins": {
+        "Html": {
+            "target": "coverage/phpmetrics.html"
+        },
+        "Xml": {
+            "target": "coverage/phpmetrics.xml"
+        },
+        "Json": {
+            "target": "coverage/phpmetrics.json"
+        }
+    }
+} 

@@ -1,0 +1,39 @@
+monolog:
+    channels: ['deprecation']
+    handlers:
+        main:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+            channels: ["!event", "!deprecation"]
+        # uncomment to get logging in your browser
+        # you may have to allow bigger header sizes in your Web server configuration
+        # firephp:
+        #     type: firephp
+        #     level: info
+        # chromephp:
+        #     type: chromephp
+        #     level: info
+        deprecation:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.deprecations.log"
+            channels: ["deprecation"]
+            level: debug
+
+when@dev:
+    monolog:
+        handlers:
+            main:
+                level: warning
+                channels: ["!event", "!deprecation"]
+            deprecation:
+                level: error
+
+when@test:
+    monolog:
+        handlers:
+            main:
+                level: warning
+                channels: ["!event", "!deprecation"]
+            deprecation:
+                level: error 

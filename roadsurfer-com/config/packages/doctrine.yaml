@@ -1,0 +1,64 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        options:
+            # Version for "create" command. Should be the same value as in doctrine_migrations.yaml
+            'serverVersion': '8.0'
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Infrastructure/Persistence/Entity'
+                prefix: 'App\Infrastructure\Persistence\Entity'
+                alias: App
+        # Performance optimizations
+        result_cache_driver:
+            type: pool
+            pool: doctrine.result_cache_pool
+        query_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+
+when@dev:
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                    default_lifetime: 3600
+                doctrine.system_cache_pool:
+                    adapter: cache.system
+                    default_lifetime: 3600
+
+when@test:
+    doctrine:
+        dbal:
+            url: '%env(resolve:TEST_DATABASE_URL)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                    default_lifetime: 3600
+                doctrine.system_cache_pool:
+                    adapter: cache.system
+                    default_lifetime: 3600
