@@ -38,16 +38,18 @@ class FruitController extends AbstractController
      *         description="Search term for fruit names",
      *         required=false,
      *
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(type="string"),
+     *         example="Apple"
      *     ),
      *
-     *     @OA\Parameter(
+     *     @OA\Parameter(c
      *         name="unit",
      *         in="query",
      *         description="Unit for quantity (g or kg)",
      *         required=false,
      *
-     *         @OA\Schema(type="string", enum={"g", "kg"}, default="g")
+     *         @OA\Schema(type="string", enum={"g", "kg"}, default="g"),
+     *         example="kg"
      *     ),
      *
      *     @OA\Response(
@@ -72,6 +74,19 @@ class FruitController extends AbstractController
      *                     @OA\Property(property="unit", type="string", example="g")
      *                 )
      *             )
+     *         ),
+     *
+     *         @OA\Example(
+     *             example="Basic Example",
+     *             summary="Example GET /api/fruits?unit=kg&search=Apple",
+     *             value={
+     *                 "success": true,
+     *                 "message": "Fruits retrieved successfully",
+     *                 "data": {
+     *                     {"id": 1, "name": "Apple", "quantity": 1.5, "unit": "kg"},
+     *                     {"id": 2, "name": "Banana", "quantity": 2.0, "unit": "kg"}
+     *                 }
+     *             }
      *         )
      *     ),
      *
@@ -107,13 +122,19 @@ class FruitController extends AbstractController
      *
      *     @OA\RequestBody(
      *         required=true,
+     *         description="Fruit data to add",
      *
-     *         @OA\JsonContent(
-     *             type="object",
+     *         @OA\MediaType(
+     *             mediaType="application/json",
      *
-     *             @OA\Property(property="name", type="string", example="Apple", description="Fruit name"),
-     *             @OA\Property(property="quantity", type="number", example=1.5, description="Quantity"),
-     *             @OA\Property(property="unit", type="string", example="kg", description="Unit (kg or g)")
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"name", "quantity", "unit"},
+     *
+     *                 @OA\Property(property="name", type="string", example="Apple"),
+     *                 @OA\Property(property="quantity", type="number", example=1.5),
+     *                 @OA\Property(property="unit", type="string", example="kg")
+     *             )
      *         )
      *     ),
      *
@@ -215,7 +236,8 @@ class FruitController extends AbstractController
      *         description="Fruit ID",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="integer"),
+     *         example=1
      *     ),
      *
      *     @OA\Response(
@@ -244,9 +266,9 @@ class FruitController extends AbstractController
      * )
      */
     #[Route('/{id}', name: 'api_fruits_remove', methods: ['DELETE'])]
-    public function removeFruit(int $fruitId): JsonResponse
+    public function removeFruit(int $id): JsonResponse
     {
-        $response = $this->fruitService->removeFruit($fruitId);
+        $response = $this->fruitService->removeFruit($id);
 
         return $this->json($response, $response->success ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
     }

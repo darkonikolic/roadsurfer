@@ -107,13 +107,19 @@ class VegetableController extends AbstractController
      *
      *     @OA\RequestBody(
      *         required=true,
+     *         description="Vegetable data to add",
      *
-     *         @OA\JsonContent(
-     *             type="object",
+     *         @OA\MediaType(
+     *             mediaType="application/json",
      *
-     *             @OA\Property(property="name", type="string", example="Carrot", description="Vegetable name"),
-     *             @OA\Property(property="quantity", type="number", example=0.5, description="Quantity"),
-     *             @OA\Property(property="unit", type="string", example="kg", description="Unit (kg or g)")
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"name", "quantity", "unit"},
+     *
+     *                 @OA\Property(property="name", type="string", example="Carrot"),
+     *                 @OA\Property(property="quantity", type="number", example=0.5),
+     *                 @OA\Property(property="unit", type="string", example="kg")
+     *             )
      *         )
      *     ),
      *
@@ -244,9 +250,9 @@ class VegetableController extends AbstractController
      * )
      */
     #[Route('/{id}', name: 'api_vegetables_remove', methods: ['DELETE'])]
-    public function removeVegetable(int $vegetableId): JsonResponse
+    public function removeVegetable(int $id): JsonResponse
     {
-        $response = $this->vegetableService->removeVegetable($vegetableId);
+        $response = $this->vegetableService->removeVegetable($id);
 
         return $this->json($response, $response->success ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
     }
