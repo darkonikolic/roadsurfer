@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class ProductListDTO
 {
     /**
      * @var ProductDTO[]
      */
+    #[Assert\Valid]
+    #[Assert\All([
+        new Assert\Type(ProductDTO::class)
+    ])]
     private readonly array $products;
 
     /**

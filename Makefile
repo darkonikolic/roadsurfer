@@ -47,6 +47,10 @@ help: ## 📖 Show this help
 	@echo "$(YELLOW)Development:$(NC)"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
+	@echo "$(YELLOW)Data Import:$(NC)"
+	@echo "$(GREEN)  import-products$(NC) - Import products from JSON file (FILE=path/to/file.json)"
+	@echo "$(GREEN)  import-default$(NC) - Import products from default request.json file"
+	@echo ""
 	@echo "$(YELLOW)Performance:$(NC)"
 	@echo "$(GREEN)  optimize$(NC) - Optimize application performance"
 	@echo ""
@@ -249,6 +253,24 @@ test-file: ## 🧪 Run specific test file (usage: make test-file FILE=path/to/te
 	@echo "$(GREEN)🧪 Running test: $(FILE)...$(NC)"
 	$(PHPUNIT) $(FILE)
 	@echo "$(GREEN)✅ Test is completed!$(NC)"
+
+# 📦 Data Import Commands
+.PHONY: import-products
+import-products: ## 📦 Import products from JSON file (usage: make import-products FILE=request.json)
+	@if [ -z "$(FILE)" ]; then \
+		echo "$(RED)❌ Please enter FILE=path/to/file.json$(NC)"; \
+		echo "$(YELLOW)Example: make import-products FILE=request.json$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)📦 Importing products from $(FILE)...$(NC)"
+	$(SYMFONY) app:import-products $(FILE)
+	@echo "$(GREEN)✅ Products import completed!$(NC)"
+
+.PHONY: import-default
+import-default: ## 📦 Import products from default request.json file
+	@echo "$(GREEN)📦 Importing products from default request.json...$(NC)"
+	$(SYMFONY) app:import-products request.json
+	@echo "$(GREEN)✅ Default products import completed!$(NC)"
 
 # 🔧 Symfony Commands
 .PHONY: cache-clear

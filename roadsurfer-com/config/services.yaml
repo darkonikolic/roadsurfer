@@ -6,6 +6,11 @@
 parameters:
 
 services:
+    # Disable PHPStan extractor to avoid version conflicts
+    property_info.extractor.phpstan:
+        class: stdClass
+        public: false
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -29,6 +34,7 @@ services:
             $redisHealth: '@App\Infrastructure\External\Health\RedisHealthService'
             $environment: '%env(APP_ENV)%'
     
+
     # Infrastructure Services
     App\Infrastructure\External\Health\DatabaseHealthService:
         arguments:

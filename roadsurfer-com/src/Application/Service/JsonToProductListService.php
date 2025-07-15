@@ -7,9 +7,16 @@ namespace App\Application\Service;
 use App\Shared\DTO\ProductDTO;
 use App\Shared\DTO\ProductListDTO;
 use InvalidArgumentException;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class JsonToProductListService
 {
+    public function __construct(
+        private readonly ValidatorInterface $validator
+    ) {
+    }
+
     public function process(string $json): ProductListDTO
     {
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
@@ -21,10 +28,16 @@ class JsonToProductListService
         $products = [];
 
         foreach ($data as $item) {
-            $products[] = $this->createProductDTO($item);
+            $productDTO = $this->createProductDTO($item);
+            $products[] = $productDTO;
         }
 
-        return new ProductListDTO($products);
+        $productListDTO = new ProductListDTO($products);
+        
+        // Validate the entire ProductListDTO
+        $this->validateProductList($productListDTO);
+
+        return $productListDTO;
     }
 
     /**
@@ -32,65 +45,46 @@ class JsonToProductListService
      */
     private function createProductDTO(array $item): ProductDTO
     {
-        $this->validateRequiredFields($item);
-        $this->validateQuantity($item);
-        $this->validateUnit($item);
-        $this->validateType($item);
-
-        return new ProductDTO(
+        // Create ProductDTO from array data
+        $productDTO = new ProductDTO(
             $item['id'] ?? null,
             $item['name'],
             $item['type'],
             (float)$item['quantity'],
             $item['unit']
         );
+
+        // Validate the ProductDTO
+        $this->validateProduct($productDTO);
+
+        return $productDTO;
     }
 
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function validateRequiredFields(array $item): void
+    private function validateProduct(ProductDTO $productDTO): void
     {
-        $requiredFields = ['name', 'type', 'quantity', 'unit'];
+        $violations = $this->validator->validate($productDTO);
 
-        foreach ($requiredFields as $field) {
-            if (!isset($item[$field])) {
-                throw new InvalidArgumentException("Missing required field: {$field}");
+        if (count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
             }
+            
+            throw new ValidationFailedException($productDTO, $violations);
         }
     }
 
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function validateQuantity(array $item): void
+    private function validateProductList(ProductListDTO $productListDTO): void
     {
-        if (!is_numeric($item['quantity'])) {
-            throw new InvalidArgumentException('Quantity must be a number');
-        }
-    }
+        $violations = $this->validator->validate($productListDTO);
 
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function validateUnit(array $item): void
-    {
-        $validUnits = ['kg', 'g'];
-
-        if (!in_array($item['unit'], $validUnits, true)) {
-            throw new InvalidArgumentException('Unit must be kg or g');
-        }
-    }
-
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function validateType(array $item): void
-    {
-        $validTypes = ['fruit', 'vegetable'];
-
-        if (!in_array($item['type'], $validTypes, true)) {
-            throw new InvalidArgumentException('Type must be fruit or vegetable');
+        if (count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+            }
+            
+            throw new ValidationFailedException($productListDTO, $violations);
         }
     }
 }

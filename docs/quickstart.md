@@ -54,6 +54,8 @@
 - **`make test`** - Run all tests
 - **`make quality-pipeline`** - Run code quality checks
 - **`make db-recreate-all`** - Recreate both development and test databases
+- **`make import-products FILE=request.json`** - Import products from JSON file
+- **`make import-default`** - Import products from default request.json file
 
 ### Quality Pipeline Components
 
@@ -142,6 +144,12 @@ make quality
 # Process request.json file
 make process-json
 
+# Import products from JSON file
+make import-products FILE=request.json
+
+# Import products from default file
+make import-default
+
 # Show all available commands
 make help
 ```
@@ -150,6 +158,7 @@ make help
 - **API Documentation**: [http://localhost:8080/api/doc](http://localhost:8080/api/doc) - Interactive API documentation
 - **API JSON Schema**: [http://localhost:8080/api/doc.json](http://localhost:8080/api/doc.json) - API schema in JSON format
 - **Health Check**: [http://localhost:8080/health](http://localhost:8080/health) - Application health status
+- **File Content API**: [http://localhost:8080/api/file_content](http://localhost:8080/api/file_content) - Get processed fruits and vegetables from request.json
 
 ### 5. Environment Configuration
 
@@ -241,6 +250,8 @@ For comprehensive troubleshooting guide, see **[Troubleshooting Guide](troublesh
 - [Troubleshooting Guide](troubleshooting.md) - Common issues and solutions
 - [Environment Configuration Guide](environment-config.md) - Environment setup and configuration
 - [Cache Strategy](cache_strategy.md) - Redis caching implementation and strategy
+- [Data Import Command](data-import-command.md) - Complete documentation of the product import command
+- [API Documentation](api_documentation.md) - Complete REST API documentation
 
 ### **Clean Architecture**
 - [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
