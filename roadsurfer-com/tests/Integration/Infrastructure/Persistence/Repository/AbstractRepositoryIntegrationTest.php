@@ -15,7 +15,7 @@ abstract class AbstractRepositoryIntegrationTest extends KernelTestCase
     {
         self::bootKernel();
         $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
-        
+
         // Start transaction for test isolation
         $this->entityManager->beginTransaction();
     }
@@ -26,7 +26,7 @@ abstract class AbstractRepositoryIntegrationTest extends KernelTestCase
         if ($this->entityManager->isOpen()) {
             $this->entityManager->rollback();
         }
-        
+
         parent::tearDown();
     }
 
@@ -41,7 +41,7 @@ abstract class AbstractRepositoryIntegrationTest extends KernelTestCase
 
     /**
      * Find entity by ID
-     * 
+     *
      * @param string $entityClass
      * @param int $id
      *

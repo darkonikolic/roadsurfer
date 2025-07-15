@@ -26,8 +26,8 @@ Build a service that:
 | 7 | API Documentation | [#bonus] | 0.5 hours |
 | 8 | Integration & E2E Testing | [#bonus] | 1 hour |
 
-**MVP Requirements:** Phases 1, 2, 2.5, 3, 5, 6 (5 hours total) - **5/6 COMPLETED**
-**Optional Enhancements:** Phases 4, 7, 8 (2 hours additional) - **2/3 COMPLETED**
+**MVP Requirements:** Phases 1, 2, 2.5, 3, 5, 6 (5 hours total) - **6/6 COMPLETED**
+**Optional Enhancements:** Phases 4, 7, 8 (2 hours additional) - **3/3 COMPLETED**
 
 ## 💡 **MAJOR FOCUS: Development Principles & Constraints**
 * **KISS, DRY, YAGNI, SOLID principles** - Keep it simple, avoid duplication, don't over-engineer
@@ -52,14 +52,14 @@ Build a service that:
 - [x] JSON processing services implemented with 100% test coverage
 - [x] Unit conversion service (kg to g) implemented
 - [x] Product splitting service implemented
-- [ ] Console command for processing request.json with custom path support
+- [x] Console command for processing request.json with custom path support
 - [x] Database entities and repositories created
 - [x] Redis caching infrastructure implemented
 - [x] Application services (FruitManagementService, VegetableManagementService) implemented
 - [x] REST API endpoints with validation implemented
 - [x] Nelmio API documentation accessible at `/api/doc`
-- [ ] Comprehensive test coverage for all components
-- [ ] Integration and end-to-end testing completed
+- [x] Comprehensive test coverage for all components
+- [x] Integration and end-to-end testing completed
 
 ## 🚀 Development Roadmap
 
@@ -87,18 +87,18 @@ Build a service that:
 - [x] [#core] Write comprehensive unit tests for all services with 100% test coverage
 - [x] [#core] Validate JSON payload structure and ensure every item in array is valid before processing
 
-### Phase 2.5: Console Command for JSON Processing (TDD First) [#core] ❌ **NOT COMPLETED**
+### Phase 2.5: Console Command for JSON Processing (TDD First) [#core] ✅ **COMPLETED**
 **Goal:** Create a Symfony console command that reads request.json file and processes the data
 **Estimated time:** 0.5 hours
 
-- [ ] [#core] Create `ProcessRequestJsonCommand` that reads JSON file from default path (`request.json`)
-- [ ] [#core] Allow custom file path as optional argument to override default path
-- [ ] [#core] Integrate with existing JSON processing services (`JsonToProductListService`, `UnitConversionService`, `ProductSplitterService`)
-- [ ] [#core] Process the JSON data and display summary of fruits and vegetables found
-- [ ] [#core] Add option to save processed data to database (fruits and vegetables)
-- [ ] [#core] Write comprehensive tests for the command with mocked services
-- [ ] [#core] Add proper error handling for file not found, invalid JSON, etc.
-- [ ] [#core] Add command to Makefile for easy execution
+- [x] [#core] Create `ProcessRequestJsonCommand` that reads JSON file from default path (`request.json`)
+- [x] [#core] Allow custom file path as optional argument to override default path
+- [x] [#core] Integrate with existing JSON processing services (`JsonToProductListService`, `UnitConversionService`, `ProductSplitterService`)
+- [x] [#core] Process the JSON data and display summary of fruits and vegetables found
+- [x] [#core] Add option to save processed data to database (fruits and vegetables)
+- [x] [#core] Write comprehensive tests for the command with mocked services
+- [x] [#core] Add proper error handling for file not found, invalid JSON, etc.
+- [x] [#core] Add command to Makefile for easy execution
 
 ### Phase 3: Database Entities and Persistence (TDD First) [#core] ✅ **COMPLETED**
 **Goal:** Create database schema and persistence layer for fruits and vegetables
@@ -109,7 +109,7 @@ Build a service that:
 - [x] [#core] Create database migrations for separate fruits and vegetables tables
 - [x] [#core] Create `FruitRepository` with search methods
 - [x] [#core] Create `VegetableRepository` with search methods
-- [ ] [#core] Write integration tests for entities and repositories
+- [x] [#core] Write integration tests for entities and repositories
 
 ### Phase 4: Caching Infrastructure (TDD First) [#optional] ✅ **COMPLETED**
 **Goal:** Implement Redis caching for improved performance on search operations
@@ -119,7 +119,7 @@ Build a service that:
 - [x] [#optional] Create `FruitCacheService` for caching fruit search results
 - [x] [#optional] Create `VegetableCacheService` for caching vegetable search results
 - [x] [#optional] Implement cache invalidation on insert/update operations
-- [ ] [#optional] Write tests for caching functionality
+- [x] [#optional] Write tests for caching functionality
 
 ### Phase 5: Application Services (TDD First) [#core] ✅ **COMPLETED**
 **Goal:** Implement business logic services for managing fruits and vegetables
@@ -145,7 +145,7 @@ Build a service that:
   - `DELETE /api/vegetables/{id}` (remove vegetable by ID)
 - [x] [#core] Create request/response DTOs for API endpoints
 - [x] [#core] Add comprehensive input validation for all endpoints
-- [ ] [#core] Write controller tests with mocked services
+- [x] [#core] Write controller tests with mocked services
 - [x] [#core] Add Nelmio API documentation annotations for all endpoints
 
 ### Phase 7: API Documentation (TDD First) [#bonus] ✅ **COMPLETED**
@@ -156,27 +156,27 @@ Build a service that:
 - [x] [#bonus] Create API documentation for all endpoints at `/api/doc`
 - [x] [#bonus] Ensure all endpoints are testable via Nelmio documentation
 - [x] [#bonus] Add example requests and responses for each endpoint
-- [ ] [#bonus] Write tests for API documentation accessibility
+- [x] [#bonus] Write tests for API documentation accessibility
 
-### Phase 8: Integration & End-to-End Testing [#bonus] ❌ **NOT COMPLETED**
+### Phase 8: Integration & End-to-End Testing [#bonus] ✅ **COMPLETED**
 **Goal:** Comprehensive testing of complete workflow and performance validation
 **Estimated time:** 1 hour
 
-- [ ] [#bonus] Create integration tests for GET endpoints without filters
-- [ ] [#bonus] Create integration tests for GET endpoints with ID filter
-- [ ] [#bonus] Create integration tests for GET endpoints with name filter
-- [ ] [#bonus] Create integration tests for GET endpoints with combined filters
-- [ ] [#bonus] Create integration tests for POST endpoints with valid data
-- [ ] [#bonus] Create integration tests for POST endpoints with invalid data
-- [ ] [#bonus] Create integration tests for DELETE endpoints with valid ID
-- [ ] [#bonus] Create integration tests for DELETE endpoints with invalid ID
-- [ ] [#bonus] Create integration tests for Vegetable endpoints (same as fruits)
-- [ ] [#bonus] Create integration tests for JSON processing workflow
-- [ ] [#bonus] Create integration tests for cache functionality
-- [ ] [#bonus] Test database operations directly via repository
-- [ ] [#bonus] Validate HTTP status codes and JSON responses
-- [ ] [#bonus] Test error handling and edge cases
-- [ ] [#bonus] Performance testing for large datasets
+- [x] [#bonus] Create integration tests for GET endpoints without filters
+- [x] [#bonus] Create integration tests for GET endpoints with ID filter
+- [x] [#bonus] Create integration tests for GET endpoints with name filter
+- [x] [#bonus] Create integration tests for GET endpoints with combined filters
+- [x] [#bonus] Create integration tests for POST endpoints with valid data
+- [x] [#bonus] Create integration tests for POST endpoints with invalid data
+- [x] [#bonus] Create integration tests for DELETE endpoints with valid ID
+- [x] [#bonus] Create integration tests for DELETE endpoints with invalid ID
+- [x] [#bonus] Create integration tests for Vegetable endpoints (same as fruits)
+- [x] [#bonus] Create integration tests for JSON processing workflow
+- [x] [#bonus] Create integration tests for cache functionality
+- [x] [#bonus] Test database operations directly via repository
+- [x] [#bonus] Validate HTTP status codes and JSON responses
+- [x] [#bonus] Test error handling and edge cases
+- [x] [#bonus] Performance testing for large datasets
 
 ## 🧪 TDD Approach for Each Feature
 1. **Write Test First** (Red) - Define expected behavior
@@ -190,27 +190,27 @@ Build a service that:
 - [x] Implement JSON processing service with 100% test coverage
 - [x] Implement unit conversion service (kg to g)
 - [x] Implement product splitting service
-- [ ] Create console command for processing request.json with custom path support
+- [x] Create console command for processing request.json with custom path support
 - [x] Create separate database tables for fruits and vegetables
 - [x] Implement Redis caching for search results with invalidation
 - [x] Create REST API endpoints with validation
 - [x] Add Nelmio API documentation for all endpoints
-- [ ] Write integration tests for all endpoints (GET/POST/DELETE with filters)
-- [ ] Write integration tests for JSON processing workflow
-- [ ] Write integration tests for cache functionality
+- [x] Write integration tests for all endpoints (GET/POST/DELETE with filters)
+- [x] Write integration tests for JSON processing workflow
+- [x] Write integration tests for cache functionality
 - [x] Preserve Makefile usage and BDD testing approach
 
 ## ⚡ **DEVELOPMENT CONSTRAINTS & FOCUS**
-- [ ] **KISS Principle**: Keep implementation simple, avoid over-engineering
-- [ ] **DRY Principle**: No code duplication, reuse common patterns
-- [ ] **YAGNI Principle**: Only implement what's needed, no premature optimization
-- [ ] **SOLID Principles**: Proper separation of concerns, single responsibility
-- [ ] **Clean Domain Model**: Focus on business logic, avoid unnecessary complexity
-- [ ] **Input Validation**: Comprehensive validation for all JSON inputs and API endpoints
-- [ ] **Controller Logic**: Keep controllers thin, move business logic to services
-- [ ] **Timebox Adherence**: Complete implementation within 3-4 hours
-- [ ] **Simple Persistence**: Straightforward database operations, no complex patterns
-- [ ] **Comprehensive Testing**: 100% test coverage for critical services
+- [x] **KISS Principle**: Keep implementation simple, avoid over-engineering
+- [x] **DRY Principle**: No code duplication, reuse common patterns
+- [x] **YAGNI Principle**: Only implement what's needed, no premature optimization
+- [x] **SOLID Principles**: Proper separation of concerns, single responsibility
+- [x] **Clean Domain Model**: Focus on business logic, avoid unnecessary complexity
+- [x] **Input Validation**: Comprehensive validation for all JSON inputs and API endpoints
+- [x] **Controller Logic**: Keep controllers thin, move business logic to services
+- [x] **Timebox Adherence**: Complete implementation within 3-4 hours
+- [x] **Simple Persistence**: Straightforward database operations, no complex patterns
+- [x] **Comprehensive Testing**: 100% test coverage for critical services
 
 ## 🎯 Success Criteria
 - [x] Symfony 7.0 LTS upgrade completed successfully
@@ -219,13 +219,13 @@ Build a service that:
 - [x] Data stored in separate database tables
 - [x] API endpoints work with search and validation
 - [x] Redis caching implemented with proper invalidation
-- [ ] Integration tests pass for all endpoints (GET/POST/DELETE with filters)
-- [ ] Integration tests pass for JSON processing workflow
-- [ ] Integration tests pass for cache functionality
+- [x] Integration tests pass for all endpoints (GET/POST/DELETE with filters)
+- [x] Integration tests pass for JSON processing workflow
+- [x] Integration tests pass for cache functionality
 - [x] Nelmio API documentation accessible at `/api/doc`
 - [x] Code follows clean architecture principles
 - [x] Makefile and BDD approach preserved
-- [ ] Console command for processing request.json with custom path support
+- [x] Console command for processing request.json with custom path support
 
 ## 📝 Notes
 - **KISS & YAGNI**: Focus on essential features only, avoid over-engineering
@@ -237,4 +237,4 @@ Build a service that:
 - **Timebox**: Complete implementation within 3-4 hours, prioritize essential features
 - **Integration Testing**: Test real database operations via repository, validate HTTP responses
 - **Backward Compatibility**: Maintain functionality during Symfony upgrade
-- [ ] Test Strategy: Focus on integration tests that cover complete workflow from HTTP to database 
+- [x] Test Strategy: Focus on integration tests that cover complete workflow from HTTP to database 

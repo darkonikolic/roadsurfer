@@ -39,7 +39,7 @@ class FruitRepositoryTest extends AbstractRepositoryIntegrationTest
 
         // Read from database using repository
         $foundFruit = $this->fruitRepository->find($testFruit->getId());
-        
+
         // Verify the entity was read correctly
         $this->assertEntityRetrievable($testFruit, Fruit::class);
         $this->assertEquals('Test Apple', $foundFruit->getName());
@@ -50,7 +50,7 @@ class FruitRepositoryTest extends AbstractRepositoryIntegrationTest
         // Test finding by name
         $fruitsByName = $this->fruitRepository->findByName('Test Apple');
         $this->assertGreaterThanOrEqual(1, count($fruitsByName));
-        
+
         $foundByName = false;
         foreach ($fruitsByName as $fruit) {
             if ($fruit->getId() === $testFruit->getId()) {
@@ -67,23 +67,23 @@ class FruitRepositoryTest extends AbstractRepositoryIntegrationTest
         $testFruit = new Fruit();
         $testFruit->setName('Test Save Fruit');
         $testFruit->setQuantity(100.0);
-        
+
         // Use repository persist and flush methods
         $this->fruitRepository->persist($testFruit);
         $this->fruitRepository->flush();
-        
+
         // Extract ID for verification
         $fruitId = $testFruit->getId();
-        
+
         // Verify it was saved using EntityManager directly
         $savedFruit = $this->entityManager->find(Fruit::class, $fruitId);
         $this->assertNotNull($savedFruit, 'Saved fruit should be retrievable');
         $this->assertEquals('Test Save Fruit', $savedFruit->getName());
-        
+
         // Test remove method
         $this->fruitRepository->remove($testFruit);
         $this->fruitRepository->flush();
-        
+
         // Verify it was removed using EntityManager directly
         $removedFruit = $this->entityManager->find(Fruit::class, $fruitId);
         $this->assertNull($removedFruit, 'Removed fruit should not be retrievable');

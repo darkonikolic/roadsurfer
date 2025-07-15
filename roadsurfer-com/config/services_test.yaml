@@ -24,4 +24,8 @@ services:
         arguments:
             $redis: '@Redis'
             $vegetableRepository: '@App\Infrastructure\Persistence\Repository\VegetableRepository'
-            $cacheTtl: '%env(CACHE_TTL)%' 
+            $cacheTtl: '%env(CACHE_TTL)%'
+    
+    # Make Redis available as a service
+    redis:
+        alias: Redis 

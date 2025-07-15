@@ -18,21 +18,21 @@ abstract class AbstractIntegrationTestCase extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        
+
         $this->container     = static::getContainer();
         $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
         $this->connection    = $this->container->get('doctrine.dbal.default_connection');
-        
+
         // Start transaction for test isolation
         $this->beginTransaction();
-        
+
     }
 
     protected function tearDown(): void
     {
         // Rollback transaction to clean up database changes
         $this->rollbackTransaction();
-        
+
         parent::tearDown();
     }
 
@@ -90,8 +90,8 @@ abstract class AbstractIntegrationTestCase extends KernelTestCase
     protected function cleanupTestData(): void
     {
         // Clear database tables
-        $this->connection->executeStatement('DELETE FROM fruit');
-        $this->connection->executeStatement('DELETE FROM vegetable');
-        
+        $this->connection->executeStatement('DELETE FROM fruits');
+        $this->connection->executeStatement('DELETE FROM vegetables');
+
     }
 }

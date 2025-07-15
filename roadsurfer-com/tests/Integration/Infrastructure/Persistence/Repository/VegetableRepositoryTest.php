@@ -39,7 +39,7 @@ class VegetableRepositoryTest extends AbstractRepositoryIntegrationTest
 
         // Read from database using repository
         $foundVegetable = $this->vegetableRepository->find($testVegetable->getId());
-        
+
         // Verify the entity was read correctly
         $this->assertEntityRetrievable($testVegetable, Vegetable::class);
         $this->assertEquals('Test Carrot', $foundVegetable->getName());
@@ -50,7 +50,7 @@ class VegetableRepositoryTest extends AbstractRepositoryIntegrationTest
         // Test finding by name
         $vegetablesByName = $this->vegetableRepository->findByName('Test Carrot');
         $this->assertGreaterThanOrEqual(1, count($vegetablesByName));
-        
+
         $foundByName = false;
         foreach ($vegetablesByName as $vegetable) {
             if ($vegetable->getId() === $testVegetable->getId()) {
@@ -63,7 +63,7 @@ class VegetableRepositoryTest extends AbstractRepositoryIntegrationTest
         // Test finding all vegetables
         $allVegetables = $this->vegetableRepository->findAll();
         $this->assertGreaterThanOrEqual(1, count($allVegetables));
-        
+
         $foundInAll = false;
         foreach ($allVegetables as $vegetable) {
             if ($vegetable->getId() === $testVegetable->getId()) {
@@ -80,23 +80,23 @@ class VegetableRepositoryTest extends AbstractRepositoryIntegrationTest
         $testVegetable = new Vegetable();
         $testVegetable->setName('Test Save Vegetable');
         $testVegetable->setQuantity(50.0);
-        
+
         // Use repository persist and flush methods
         $this->vegetableRepository->persist($testVegetable);
         $this->vegetableRepository->flush();
-        
+
         // Extract ID for verification
         $vegetableId = $testVegetable->getId();
-        
+
         // Verify it was saved using EntityManager directly
         $savedVegetable = $this->entityManager->find(Vegetable::class, $vegetableId);
         $this->assertNotNull($savedVegetable, 'Saved vegetable should be retrievable');
         $this->assertEquals('Test Save Vegetable', $savedVegetable->getName());
-        
+
         // Test remove method
         $this->vegetableRepository->remove($testVegetable);
         $this->vegetableRepository->flush();
-        
+
         // Verify it was removed using EntityManager directly
         $removedVegetable = $this->entityManager->find(Vegetable::class, $vegetableId);
         $this->assertNull($removedVegetable, 'Removed vegetable should not be retrievable');
