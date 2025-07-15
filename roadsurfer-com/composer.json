@@ -27,18 +27,18 @@
         "zircote/swagger-php": "^4.7"
     },
     "require-dev": {
+        "composer/xdebug-handler": "^3.0",
+        "friendsofphp/php-cs-fixer": "3.55.0",
+        "phpmd/phpmd": "^2.15",
+        "phpmetrics/phpmetrics": "^2.8",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
+        "sebastian/phpcpd": "^6.0",
         "symfony/browser-kit": "^7.0",
         "symfony/css-selector": "^7.0",
         "symfony/maker-bundle": "^1.50",
         "symfony/phpunit-bridge": "^7.0",
-        "vimeo/psalm": "^5.0",
-        "phpstan/phpstan": "^1.10",
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "phpmd/phpmd": "^2.15",
-        "sebastian/phpcpd": "^6.0",
-        "phpmetrics/phpmetrics": "^2.8",
-        "composer/xdebug-handler": "^3.0"
+        "vimeo/psalm": "^5.0"
     },
     "config": {
         "allow-plugins": {
@@ -92,7 +92,7 @@
             "composer dump-autoload --optimize"
         ],
         "quality": [
-            "php-cs-fixer fix",
+            "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no",
             "psalm",
             "phpstan analyse",
             "phpmd src text phpmd.xml",
@@ -105,16 +105,17 @@
             "phpmd src text phpmd.xml"
         ],
         "format": [
-            "php-cs-fixer fix"
+            "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no"
+        ],
+        "format-optimize": [
+            "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no --optimize"
         ],
         "optimize": [
             "composer dump-autoload --optimize --classmap-authoritative"
         ],
         "quality-optimize": [
-            "composer dump-autoload --optimize",
             "psalm --no-cache --no-progress",
-            "phpstan analyse --no-progress",
-            "php-cs-fixer fix"
+            "phpstan analyse --no-progress"
         ],
         "cache-clear": [
             "php bin/console cache:clear --no-warmup"
@@ -123,7 +124,7 @@
             "php bin/console cache:warmup"
         ],
         "quality-pipeline": [
-            "composer run-script format",
+            "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=no",
             "composer run-script quality-optimize",
             "phpmd src text phpmd.xml --strict",
             "phpcpd src",

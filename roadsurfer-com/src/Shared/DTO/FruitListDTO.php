@@ -4,29 +4,40 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO;
 
-readonly class FruitListDTO
+class FruitListDTO
 {
+    /**
+     * @var FruitDTO[]
+     */
+    private readonly array $fruits;
+
     /**
      * @param FruitDTO[] $fruits
      */
-    public function __construct(
-        public array $fruits = []
-    ) {
+    public function __construct(array $fruits = [])
+    {
+        $this->fruits = $fruits;
     }
 
-    public static function create(array $fruits = []): self
+    /**
+     * @param FruitDTO[] $fruits
+     */
+    public static function create(array $fruits): self
     {
         return new self($fruits);
     }
 
     public function addFruit(FruitDTO $fruit): self
     {
-        $fruits = $this->fruits;
+        $fruits   = $this->fruits;
         $fruits[] = $fruit;
 
         return new self($fruits);
     }
 
+    /**
+     * @return FruitDTO[]
+     */
     public function getFruits(): array
     {
         return $this->fruits;
@@ -40,5 +51,13 @@ readonly class FruitListDTO
     public function isEmpty(): bool
     {
         return empty($this->fruits);
+    }
+
+    /**
+     * @param FruitDTO[] $fruits
+     */
+    public function setFruits(array $fruits): self
+    {
+        return new self($fruits);
     }
 }

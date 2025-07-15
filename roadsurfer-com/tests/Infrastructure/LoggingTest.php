@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Infrastructure;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -15,12 +17,12 @@ class LoggingTest extends KernelTestCase
         self::bootKernel();
         $this->container = static::getContainer();
 
-        $logDir = $this->container->getParameter('kernel.logs_dir');
-        $environment = $this->container->getParameter('kernel.environment');
+        $logDir        = $this->container->getParameter('kernel.logs_dir');
+        $environment   = $this->container->getParameter('kernel.environment');
         $this->logFile = $logDir . '/' . $environment . '.log';
 
         // Ensure log directory exists
-        if (! is_dir($logDir)) {
+        if (!is_dir($logDir)) {
             mkdir($logDir, 0777, true);
         }
     }
@@ -75,7 +77,7 @@ class LoggingTest extends KernelTestCase
 
         // Test different log levels
         $debugMessage = 'Debug message ' . uniqid();
-        $infoMessage = 'Info message ' . uniqid();
+        $infoMessage  = 'Info message ' . uniqid();
         $errorMessage = 'Error message ' . uniqid();
 
         $logger->debug($debugMessage);
@@ -116,8 +118,8 @@ class LoggingTest extends KernelTestCase
         // Check if log file exists before reading
         if (file_exists($this->logFile)) {
             $logContent = file_get_contents($this->logFile);
-            $logLines = explode("\n", trim($logContent));
-            $lastLine = end($logLines);
+            $logLines   = explode("\n", trim($logContent));
+            $lastLine   = end($logLines);
 
             // Verify log format contains timestamp and level
             $this->assertStringContainsString($testMessage, $lastLine);

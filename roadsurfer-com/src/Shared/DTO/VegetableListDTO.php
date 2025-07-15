@@ -4,29 +4,40 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO;
 
-readonly class VegetableListDTO
+class VegetableListDTO
 {
+    /**
+     * @var VegetableDTO[]
+     */
+    private readonly array $vegetables;
+
     /**
      * @param VegetableDTO[] $vegetables
      */
-    public function __construct(
-        public array $vegetables = []
-    ) {
+    public function __construct(array $vegetables = [])
+    {
+        $this->vegetables = $vegetables;
     }
 
-    public static function create(array $vegetables = []): self
+    /**
+     * @param VegetableDTO[] $vegetables
+     */
+    public static function create(array $vegetables): self
     {
         return new self($vegetables);
     }
 
     public function addVegetable(VegetableDTO $vegetable): self
     {
-        $vegetables = $this->vegetables;
+        $vegetables   = $this->vegetables;
         $vegetables[] = $vegetable;
 
         return new self($vegetables);
     }
 
+    /**
+     * @return VegetableDTO[]
+     */
     public function getVegetables(): array
     {
         return $this->vegetables;
@@ -40,5 +51,13 @@ readonly class VegetableListDTO
     public function isEmpty(): bool
     {
         return empty($this->vegetables);
+    }
+
+    /**
+     * @param VegetableDTO[] $vegetables
+     */
+    public function setVegetables(array $vegetables): self
+    {
+        return new self($vegetables);
     }
 }

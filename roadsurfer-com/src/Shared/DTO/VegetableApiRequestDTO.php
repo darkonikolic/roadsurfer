@@ -16,7 +16,7 @@ class VegetableApiRequestDTO
         #[Assert\Positive(message: 'Quantity must be positive')]
         public float $quantity = 0.0,
         #[Assert\Choice(choices: ['kg', 'g'], message: 'Unit must be either kg or g')]
-        public string $unit = 'kg'
+        public string $unit = 'kg',
     ) {
     }
 }

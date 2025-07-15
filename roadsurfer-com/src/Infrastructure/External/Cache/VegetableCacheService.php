@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Infrastructure\External\Cache;
 
 use App\Infrastructure\Persistence\Entity\Vegetable;
-use Redis;
+use App\Shared\DTO\VegetableDTO;
 
 class VegetableCacheService
 {
-    private const CACHE_TTL_ALL = 3600; // 1 hour
+    private const CACHE_TTL_ALL    = 3600; // 1 hour
     private const CACHE_TTL_SEARCH = 1800; // 30 minutes
-    private const CACHE_PREFIX = 'vegetables:';
+    private const CACHE_PREFIX     = 'vegetables:';
 
-    private Redis $redis;
+    private \Redis $redis;
 
-    public function __construct(Redis $redis)
+    public function __construct(\Redis $redis)
     {
         $this->redis = $redis;
         $this->connectRedis();
@@ -23,10 +23,10 @@ class VegetableCacheService
 
     private function connectRedis(): void
     {
-        if (! $this->redis->isConnected()) {
-            $host = getenv('REDIS_HOST') ?: 'redis';
-            $port = (int) (getenv('REDIS_PORT') ?: 6379);
-            $database = (int) (getenv('REDIS_DB') ?: 0);
+        if (!$this->redis->isConnected()) {
+            $host     = getenv('REDIS_HOST') ?: 'redis';
+            $port     = (int)(getenv('REDIS_PORT') ?: 6379);
+            $database = (int)(getenv('REDIS_DB') ?: 0);
 
             $this->redis->connect($host, $port);
             $this->redis->select($database);
@@ -34,18 +34,18 @@ class VegetableCacheService
     }
 
     /**
-     * @return array|null
+     * @return array<VegetableDTO>
      */
-    public function getVegetables(): ?array
+    public function getVegetables(): array
     {
-        $cacheKey = self::CACHE_PREFIX . 'all';
+        $cacheKey   = self::CACHE_PREFIX . 'all';
         $cachedData = $this->redis->get($cacheKey);
 
-        if ($cachedData === false) {
-            return null;
+        if (false === $cachedData) {
+            return [];
         }
 
-        return json_decode($cachedData, true);
+        return unserialize($cachedData);
     }
 
     /**
@@ -54,24 +54,24 @@ class VegetableCacheService
     public function setVegetables(array $vegetables): void
     {
         $cacheKey = self::CACHE_PREFIX . 'all';
-        $data = $this->serializeVegetables($vegetables);
+        $data     = $this->serializeVegetables($vegetables);
 
         $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, $data);
     }
 
     /**
-     * @return array|null
+     * @return array<VegetableDTO>
      */
-    public function getVegetablesByName(string $searchTerm): ?array
+    public function getVegetablesByName(string $searchTerm): array
     {
-        $cacheKey = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
+        $cacheKey   = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
         $cachedData = $this->redis->get($cacheKey);
 
-        if ($cachedData === false) {
-            return null;
+        if (false === $cachedData) {
+            return [];
         }
 
-        return json_decode($cachedData, true);
+        return unserialize($cachedData);
     }
 
     /**
@@ -80,7 +80,7 @@ class VegetableCacheService
     public function setVegetablesByName(string $searchTerm, array $vegetables): void
     {
         $cacheKey = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
-        $data = $this->serializeVegetables($vegetables);
+        $data     = $this->serializeVegetables($vegetables);
 
         $this->redis->setex($cacheKey, self::CACHE_TTL_SEARCH, $data);
     }
@@ -88,9 +88,9 @@ class VegetableCacheService
     public function invalidateCache(): void
     {
         $pattern = self::CACHE_PREFIX . '*';
-        $keys = $this->redis->keys($pattern);
+        $keys    = $this->redis->keys($pattern);
 
-        if (! empty($keys)) {
+        if (!empty($keys)) {
             foreach ($keys as $key) {
                 $this->redis->del($key);
             }
@@ -98,24 +98,21 @@ class VegetableCacheService
     }
 
     // Methods for management services
-    public function getCachedVegetables(?string $search = null): ?array
+    /**
+     * @return array<VegetableDTO>
+     */
+    public function getCachedVegetables(): array
     {
-        if ($search) {
-            return $this->getVegetablesByName($search);
-        }
-
         return $this->getVegetables();
     }
 
-    public function cacheVegetables(array $vegetables, ?string $search = null): void
+    /**
+     * @param array<VegetableDTO> $vegetables
+     */
+    public function cacheVegetables(array $vegetables): void
     {
-        if ($search) {
-            $this->setVegetablesByName($search, $vegetables);
-
-            return;
-        }
-
-        $this->setVegetables($vegetables);
+        $cacheKey = self::CACHE_PREFIX . 'all';
+        $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, serialize($vegetables));
     }
 
     /**
@@ -126,9 +123,9 @@ class VegetableCacheService
         $data = [];
         foreach ($vegetables as $vegetable) {
             $data[] = [
-                'id' => $vegetable->getId(),
-                'name' => $vegetable->getName(),
-                'quantity' => $vegetable->getQuantity(),
+                'id'         => $vegetable->getId(),
+                'name'       => $vegetable->getName(),
+                'quantity'   => $vegetable->getQuantity(),
                 'created_at' => $vegetable->getCreatedAt()?->format('c'),
                 'updated_at' => $vegetable->getUpdatedAt()?->format('c'),
             ];

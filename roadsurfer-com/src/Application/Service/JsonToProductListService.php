@@ -14,7 +14,7 @@ class JsonToProductListService
     {
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             throw new InvalidArgumentException('JSON must be an array');
         }
 
@@ -27,6 +27,9 @@ class JsonToProductListService
         return new ProductListDTO($products);
     }
 
+    /**
+     * @param array<string, mixed> $item
+     */
     private function createProductDTO(array $item): ProductDTO
     {
         $this->validateRequiredFields($item);
@@ -38,43 +41,55 @@ class JsonToProductListService
             $item['id'] ?? null,
             $item['name'],
             $item['type'],
-            (float) $item['quantity'],
+            (float)$item['quantity'],
             $item['unit']
         );
     }
 
+    /**
+     * @param array<string, mixed> $item
+     */
     private function validateRequiredFields(array $item): void
     {
         $requiredFields = ['name', 'type', 'quantity', 'unit'];
 
         foreach ($requiredFields as $field) {
-            if (! isset($item[$field])) {
+            if (!isset($item[$field])) {
                 throw new InvalidArgumentException("Missing required field: {$field}");
             }
         }
     }
 
+    /**
+     * @param array<string, mixed> $item
+     */
     private function validateQuantity(array $item): void
     {
-        if (! is_numeric($item['quantity'])) {
+        if (!is_numeric($item['quantity'])) {
             throw new InvalidArgumentException('Quantity must be a number');
         }
     }
 
+    /**
+     * @param array<string, mixed> $item
+     */
     private function validateUnit(array $item): void
     {
         $validUnits = ['kg', 'g'];
 
-        if (! in_array($item['unit'], $validUnits, true)) {
+        if (!in_array($item['unit'], $validUnits, true)) {
             throw new InvalidArgumentException('Unit must be kg or g');
         }
     }
 
+    /**
+     * @param array<string, mixed> $item
+     */
     private function validateType(array $item): void
     {
         $validTypes = ['fruit', 'vegetable'];
 
-        if (! in_array($item['type'], $validTypes, true)) {
+        if (!in_array($item['type'], $validTypes, true)) {
             throw new InvalidArgumentException('Type must be fruit or vegetable');
         }
     }

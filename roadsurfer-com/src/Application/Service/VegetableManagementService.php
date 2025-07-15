@@ -9,13 +9,14 @@ use App\Infrastructure\Persistence\Entity\Vegetable;
 use App\Infrastructure\Persistence\Entity\VegetableRepository;
 use App\Shared\DTO\ApiResponseDTO;
 use App\Shared\DTO\VegetableApiRequestDTO;
+use App\Shared\DTO\VegetableDTO;
 
 class VegetableManagementService
 {
     public function __construct(
         private readonly VegetableRepository $vegetableRepository,
         private readonly VegetableCacheService $vegetableCacheService,
-        private readonly UnitConversionService $conversionService
+        private readonly UnitConversionService $conversionService,
     ) {
     }
 
@@ -32,10 +33,10 @@ class VegetableManagementService
             $this->vegetableCacheService->invalidateCache();
 
             return new ApiResponseDTO(true, 'Vegetable added successfully', [
-                'id' => $vegetable->getId(),
-                'name' => $vegetable->getName(),
+                'id'       => $vegetable->getId(),
+                'name'     => $vegetable->getName(),
                 'quantity' => $vegetable->getQuantity(),
-                'unit' => 'g',
+                'unit'     => 'g',
             ]);
         } catch (\Exception $e) {
             return new ApiResponseDTO(false, 'Failed to add vegetable: ' . $e->getMessage());
@@ -47,7 +48,7 @@ class VegetableManagementService
         try {
             $vegetable = $this->vegetableRepository->find($vegetableId);
 
-            if (! $vegetable) {
+            if (!$vegetable) {
                 return new ApiResponseDTO(false, 'Vegetable not found');
             }
 
@@ -60,27 +61,36 @@ class VegetableManagementService
         }
     }
 
-    public function listVegetables(?string $search = null, ?string $unit = 'g'): ApiResponseDTO
+    public function listVegetables(?string $unit = 'g'): ApiResponseDTO
     {
         try {
-            $vegetables = $this->vegetableCacheService->getCachedVegetables($search);
+            $vegetables = $this->vegetableCacheService->getCachedVegetables();
 
-            if ($vegetables === null) {
-                $vegetables = $this->vegetableRepository->findBySearch($search);
-                $this->vegetableCacheService->cacheVegetables($vegetables, $search);
+            if (empty($vegetables)) {
+                $vegetables    = $this->vegetableRepository->findAll();
+                $vegetableDTOs = array_map(function ($vegetable) {
+                    return new VegetableDTO(
+                        $vegetable->getId(),
+                        $vegetable->getName(),
+                        (float)$vegetable->getQuantity(),
+                        'kg'
+                    );
+                }, $vegetables);
+                $this->vegetableCacheService->cacheVegetables($vegetableDTOs);
+                $vegetables = $vegetableDTOs;
             }
 
-            $data = array_map(function (Vegetable $vegetable) use ($unit) {
-                $quantity = $vegetable->getQuantity();
-                if ($unit === 'kg') {
+            $data = array_map(function (VegetableDTO $vegetable) use ($unit) {
+                $quantity = $vegetable->quantity;
+                if ('kg' === $unit) {
                     $quantity = $this->conversionService->convertToKilograms($quantity);
                 }
 
                 return [
-                    'id' => $vegetable->getId(),
-                    'name' => $vegetable->getName(),
+                    'id'       => $vegetable->productId,
+                    'name'     => $vegetable->name,
                     'quantity' => $quantity,
-                    'unit' => $unit,
+                    'unit'     => $unit,
                 ];
             }, $vegetables);
 

@@ -17,18 +17,18 @@ class ProductSplitterService
      */
     public function split(ProductListDTO $productList): array
     {
-        $fruits = [];
+        $fruits     = [];
         $vegetables = [];
 
         foreach ($productList->getProducts() as $product) {
-            if ($product->type === 'fruit') {
+            if ('fruit' === $product->type) {
                 $fruits[] = new FruitDTO(
                     $product->productId,
                     $product->name,
                     $product->quantity,
                     $product->unit
                 );
-            } elseif ($product->type === 'vegetable') {
+            } elseif ('vegetable' === $product->type) {
                 $vegetables[] = new VegetableDTO(
                     $product->productId,
                     $product->name,
@@ -39,7 +39,7 @@ class ProductSplitterService
         }
 
         return [
-            'fruits' => new FruitListDTO($fruits),
+            'fruits'     => new FruitListDTO($fruits),
             'vegetables' => new VegetableListDTO($vegetables),
         ];
     }
@@ -49,7 +49,7 @@ class ProductSplitterService
         $fruits = [];
 
         foreach ($productList->getProducts() as $product) {
-            if ($product->type === 'fruit') {
+            if ('fruit' === $product->type) {
                 $fruits[] = $product;
             }
         }
@@ -62,7 +62,7 @@ class ProductSplitterService
         $vegetables = [];
 
         foreach ($productList->getProducts() as $product) {
-            if ($product->type === 'vegetable') {
+            if ('vegetable' === $product->type) {
                 $vegetables[] = $product;
             }
         }

@@ -4,28 +4,31 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO;
 
-readonly class ServiceHealthDTO
+class ServiceHealthDTO
 {
     public function __construct(
         public string $status,
         public bool $connected,
-        public ?string $error = null
+        public ?string $error = null,
     ) {
     }
 
     public function isHealthy(): bool
     {
-        return $this->status === 'ok' && $this->connected;
+        return 'ok' === $this->status && $this->connected;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         $data = [
-            'status' => $this->status,
+            'status'    => $this->status,
             'connected' => $this->connected,
         ];
 
-        if ($this->error !== null) {
+        if (null !== $this->error) {
             $data['error'] = $this->error;
         }
 

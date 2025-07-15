@@ -1,5 +1,54 @@
 # Quick Start Guide
 
+## 🚀 Quick Start
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Git installed
+
+### Installation Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/darkonikolic/roadsurfer
+   ```
+
+2. **Navigate to project directory:**
+   ```bash
+   cd roadsurfer
+   ```
+
+3. **Start the application:**
+   ```bash
+   make up
+   ```
+
+4. **Install dependencies and setup database:**
+   ```bash
+   make install
+   ```
+
+### Access Points
+
+- **Main Application:** http://localhost:8080
+- **API Documentation:** http://localhost:8080/api/doc
+- **PHPMyAdmin:** http://localhost:8081
+- **Health Check:** http://localhost:8080/health
+
+### Development Commands
+
+- **`make shell`** - Enter application shell
+- **`make test`** - Run all tests
+- **`make quality-pipeline`** - Run code quality checks
+
+### Troubleshooting
+
+If you encounter port conflicts, the application uses:
+- **MySQL:** Port 3307 (instead of default 3306)
+- **Redis:** Port 6380 (instead of default 6379)
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites

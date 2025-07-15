@@ -45,7 +45,7 @@
         "version": "1.2.3"
     },
     "friendsofphp/php-cs-fixer": {
-        "version": "3.66",
+        "version": "3.55",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -336,9 +336,6 @@
         "version": "v1.25.0"
     },
     "symfony/polyfill-mbstring": {
-        "version": "v1.25.0"
-    },
-    "symfony/polyfill-php81": {
         "version": "v1.25.0"
     },
     "symfony/routing": {

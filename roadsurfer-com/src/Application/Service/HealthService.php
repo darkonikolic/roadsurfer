@@ -14,7 +14,7 @@ class HealthService
     public function __construct(
         private readonly DatabaseHealthService $databaseHealth,
         private readonly RedisHealthService $redisHealth,
-        private readonly string $environment = 'dev'
+        private readonly string $environment = 'dev',
     ) {
     }
 

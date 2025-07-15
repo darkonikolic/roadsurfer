@@ -24,7 +24,7 @@ class UnitConversionService
 
     public function convertToGrams(float $quantity, string $unit): float
     {
-        if ($unit === 'kg') {
+        if ('kg' === $unit) {
             return $quantity * self::KG_TO_G;
         }
 
@@ -39,11 +39,11 @@ class UnitConversionService
     private function convertProductToGrams(ProductDTO $product): ProductDTO
     {
         $quantity = $product->quantity;
-        $unit = $product->unit;
+        $unit     = $product->unit;
 
-        if ($unit === 'kg') {
+        if ('kg' === $unit) {
             $quantity = $quantity * self::KG_TO_G;
-            $unit = 'g';
+            $unit     = 'g';
         }
 
         return new ProductDTO(

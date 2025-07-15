@@ -12,8 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Vegetable|null find($id, $lockMode = null, $lockVersion = null)
  * @method Vegetable|null findOneBy(array $criteria, array $orderBy = null)
- * @method Vegetable[]    findAll()
- * @method Vegetable[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Vegetable[] findAll()
+ * @method Vegetable[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class VegetableRepository extends ServiceEntityRepository
 {

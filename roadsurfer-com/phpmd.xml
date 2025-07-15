@@ -15,6 +15,7 @@
     <rule ref="rulesets/controversial.xml">
         <exclude name="StaticAccess"/>
         <exclude name="Superglobals"/>
+        <exclude name="MissingImport"/>
     </rule>
     
     <!-- Exclude migration files -->

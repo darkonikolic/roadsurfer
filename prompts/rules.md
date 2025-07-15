@@ -28,6 +28,8 @@ All AI interactions within this repository must strictly follow these rules. The
 - Do not explain why something is helpful or educational unless explicitly asked.
 - These prompts are for planning and demonstration — not learning.
 
+<!--
 ## 7. 🛠️ Planning Only
 - No code generation unless explicitly required.
 - These prompts are for design, architecture, and execution planning. 
+--> 

@@ -12,8 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Fruit|null find($id, $lockMode = null, $lockVersion = null)
  * @method Fruit|null findOneBy(array $criteria, array $orderBy = null)
- * @method Fruit[]    findAll()
- * @method Fruit[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Fruit[] findAll()
+ * @method Fruit[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class FruitRepository extends ServiceEntityRepository
 {

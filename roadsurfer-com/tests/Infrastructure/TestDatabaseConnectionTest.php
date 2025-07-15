@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Infrastructure;
 
 use Doctrine\DBAL\Connection;
@@ -21,7 +23,7 @@ class TestDatabaseConnectionTest extends KernelTestCase
 
         try {
             // Try to connect if not already connected
-            if (! $this->connection->isConnected()) {
+            if (!$this->connection->isConnected()) {
                 $this->connection->connect();
             }
 
@@ -35,7 +37,7 @@ class TestDatabaseConnectionTest extends KernelTestCase
     {
         try {
             $result = $this->connection->executeQuery('SELECT 1 as test');
-            $row = $result->fetchAssociative();
+            $row    = $result->fetchAssociative();
 
             $this->assertEquals(1, $row['test']);
         } catch (\Exception $e) {

@@ -1,6 +1,4 @@
 # Symfony
-/var/
-/vendor/
 .env.local
 .env.*.local
 
@@ -42,8 +40,9 @@ Thumbs.db
 # Symfony specific
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/var/
-/vendor/
+/var/cache/*
+/var/log/*
+/vendor/*
 
 # Environment files
 .env

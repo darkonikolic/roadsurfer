@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Presentation\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,9 +14,9 @@ class DefaultController extends AbstractController
     public function index(): Response
     {
         return $this->render('index.html.twig', [
-            'message' => 'Welcome to Roadster Application!',
+            'message'     => 'Welcome to Roadster Application!',
             'environment' => $this->getParameter('kernel.environment'),
-            'timestamp' => date('c'),
+            'timestamp'   => date('c'),
         ]);
     }
 }

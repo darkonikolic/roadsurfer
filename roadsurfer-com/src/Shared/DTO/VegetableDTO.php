@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO;
 
+use App\Shared\DTO\ProductDTO;
 use InvalidArgumentException;
 
-readonly class VegetableDTO extends ProductDTO
+class VegetableDTO extends ProductDTO
 {
     public function __construct(
         ?int $productId,
         string $name,
         float $quantity,
-        string $unit
+        string $unit,
     ) {
         parent::__construct($productId, $name, 'vegetable', $quantity, $unit);
     }
@@ -22,9 +23,9 @@ readonly class VegetableDTO extends ProductDTO
         string $name,
         string $type,
         float $quantity,
-        string $unit
+        string $unit,
     ): self {
-        if ($type !== 'vegetable') {
+        if ('vegetable' !== $type) {
             throw new InvalidArgumentException('Type must be vegetable');
         }
 
@@ -33,7 +34,7 @@ readonly class VegetableDTO extends ProductDTO
 
     public static function fromProductDTO(ProductDTO $productDTO): self
     {
-        if ($productDTO->type !== 'vegetable') {
+        if ('vegetable' !== $productDTO->type) {
             throw new InvalidArgumentException('Product must be of type vegetable');
         }
 

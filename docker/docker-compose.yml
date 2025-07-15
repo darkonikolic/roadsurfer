@@ -8,6 +8,8 @@ services:
     volumes:
       - ../roadsurfer-com:/var/www
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
+      - var_cache:/var/www/var/cache
+      - var_log:/var/www/var/log
     environment:
       - APP_ENV=dev
       - APP_DEBUG=1
@@ -50,7 +52,7 @@ services:
       MYSQL_USER: roadster
       MYSQL_PASSWORD: roadster
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -61,7 +63,7 @@ services:
     image: redis:alpine
     container_name: roadster_redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -86,6 +88,8 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  var_cache:
+  var_log:
 
 networks:
   roadster_network:

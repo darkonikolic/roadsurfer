@@ -22,7 +22,7 @@ class FruitController extends AbstractController
 {
     public function __construct(
         private readonly FruitManagementService $fruitService,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
     ) {
     }
 
@@ -31,32 +31,41 @@ class FruitController extends AbstractController
      *     path="/api/fruits",
      *     summary="List all fruits",
      *     description="Retrieve a list of all fruits with optional search and unit conversion",
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Search term for fruit names",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="unit",
      *         in="query",
      *         description="Unit for quantity (g or kg)",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"g", "kg"}, default="g")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of fruits retrieved successfully",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Fruits retrieved successfully"),
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="name", type="string", example="Apple"),
      *                     @OA\Property(property="quantity", type="number", example=500.0),
@@ -65,11 +74,14 @@ class FruitController extends AbstractController
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Failed to retrieve fruits"),
      *             @OA\Property(property="errors", type="array", @OA\Items(type="string"))
@@ -80,10 +92,9 @@ class FruitController extends AbstractController
     #[Route('', name: 'api_fruits_list', methods: ['GET'])]
     public function listFruits(Request $request): JsonResponse
     {
-        $search = $request->query->get('search');
         $unit = $request->query->get('unit', 'g');
 
-        $response = $this->fruitService->listFruits($search, $unit);
+        $response = $this->fruitService->listFruits($unit);
 
         return $this->json($response, $response->success ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -93,20 +104,26 @@ class FruitController extends AbstractController
      *     path="/api/fruits",
      *     summary="Add a new fruit",
      *     description="Add a new fruit to the collection with validation",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="name", type="string", example="Apple", description="Fruit name"),
      *             @OA\Property(property="quantity", type="number", example=1.5, description="Quantity"),
      *             @OA\Property(property="unit", type="string", example="kg", description="Unit (kg or g)")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Fruit added successfully",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Fruit added successfully"),
      *             @OA\Property(
@@ -119,21 +136,27 @@ class FruitController extends AbstractController
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Validation failed"),
      *             @OA\Property(property="errors", type="array", @OA\Items(type="string"))
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Failed to add fruit"),
      *             @OA\Property(property="errors", type="array", @OA\Items(type="string"))
@@ -146,17 +169,17 @@ class FruitController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (! $data) {
+        if (!$data) {
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid JSON data',
-                'errors' => ['Request body must be valid JSON'],
+                'errors'  => ['Request body must be valid JSON'],
             ], Response::HTTP_BAD_REQUEST);
         }
 
         $fruitRequest = new FruitApiRequestDTO(
             $data['name'] ?? '',
-            (float) ($data['quantity'] ?? 0),
+            (float)($data['quantity'] ?? 0),
             $data['unit'] ?? 'kg'
         );
 
@@ -171,7 +194,7 @@ class FruitController extends AbstractController
             return $this->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $errorMessages,
+                'errors'  => $errorMessages,
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -185,27 +208,35 @@ class FruitController extends AbstractController
      *     path="/api/fruits/{id}",
      *     summary="Remove a fruit",
      *     description="Remove a fruit from the collection by ID",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="Fruit ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Fruit removed successfully",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Fruit removed successfully")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Fruit not found",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Fruit not found")
      *         )

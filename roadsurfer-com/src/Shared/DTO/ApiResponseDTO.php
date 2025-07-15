@@ -8,6 +8,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ApiResponseDTO
 {
+    /**
+     * @param array<int, string> $errors
+     */
     public function __construct(
         #[Groups(['api'])]
         public bool $success,
@@ -16,7 +19,7 @@ class ApiResponseDTO
         #[Groups(['api'])]
         public mixed $data = null,
         #[Groups(['api'])]
-        public array $errors = []
+        public array $errors = [],
     ) {
     }
 
@@ -25,8 +28,11 @@ class ApiResponseDTO
         return new self(true, $message, $data);
     }
 
-    public static function error(string $message, array $errors = []): self
+    /**
+     * @param array<int, string> $errors
+     */
+    public static function error(array $errors): self
     {
-        return new self(false, $message, null, $errors);
+        return new self(false, 'Error occurred', null, $errors);
     }
 }

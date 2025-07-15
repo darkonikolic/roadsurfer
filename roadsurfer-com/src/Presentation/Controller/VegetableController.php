@@ -22,7 +22,7 @@ class VegetableController extends AbstractController
 {
     public function __construct(
         private readonly VegetableManagementService $vegetableService,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
     ) {
     }
 
@@ -31,32 +31,41 @@ class VegetableController extends AbstractController
      *     path="/api/vegetables",
      *     summary="List all vegetables",
      *     description="Retrieve a list of all vegetables with optional search and unit conversion",
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Search term for vegetable names",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="unit",
      *         in="query",
      *         description="Unit for quantity (g or kg)",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"g", "kg"}, default="g")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of vegetables retrieved successfully",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Vegetables retrieved successfully"),
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="name", type="string", example="Carrot"),
      *                     @OA\Property(property="quantity", type="number", example=300.0),
@@ -65,11 +74,14 @@ class VegetableController extends AbstractController
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Failed to retrieve vegetables"),
      *             @OA\Property(property="errors", type="array", @OA\Items(type="string"))
@@ -80,10 +92,9 @@ class VegetableController extends AbstractController
     #[Route('', name: 'api_vegetables_list', methods: ['GET'])]
     public function listVegetables(Request $request): JsonResponse
     {
-        $search = $request->query->get('search');
         $unit = $request->query->get('unit', 'g');
 
-        $response = $this->vegetableService->listVegetables($search, $unit);
+        $response = $this->vegetableService->listVegetables($unit);
 
         return $this->json($response, $response->success ? Response::HTTP_OK : Response::HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -93,20 +104,26 @@ class VegetableController extends AbstractController
      *     path="/api/vegetables",
      *     summary="Add a new vegetable",
      *     description="Add a new vegetable to the collection with validation",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="name", type="string", example="Carrot", description="Vegetable name"),
      *             @OA\Property(property="quantity", type="number", example=0.5, description="Quantity"),
      *             @OA\Property(property="unit", type="string", example="kg", description="Unit (kg or g)")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Vegetable added successfully",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Vegetable added successfully"),
      *             @OA\Property(
@@ -119,21 +136,27 @@ class VegetableController extends AbstractController
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Validation failed"),
      *             @OA\Property(property="errors", type="array", @OA\Items(type="string"))
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Failed to add vegetable"),
      *             @OA\Property(property="errors", type="array", @OA\Items(type="string"))
@@ -146,17 +169,17 @@ class VegetableController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (! $data) {
+        if (!$data) {
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid JSON data',
-                'errors' => ['Request body must be valid JSON'],
+                'errors'  => ['Request body must be valid JSON'],
             ], Response::HTTP_BAD_REQUEST);
         }
 
         $vegetableRequest = new VegetableApiRequestDTO(
             $data['name'] ?? '',
-            (float) ($data['quantity'] ?? 0),
+            (float)($data['quantity'] ?? 0),
             $data['unit'] ?? 'kg'
         );
 
@@ -171,7 +194,7 @@ class VegetableController extends AbstractController
             return $this->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $errorMessages,
+                'errors'  => $errorMessages,
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -185,27 +208,35 @@ class VegetableController extends AbstractController
      *     path="/api/vegetables/{id}",
      *     summary="Remove a vegetable",
      *     description="Remove a vegetable from the collection by ID",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="Vegetable ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Vegetable removed successfully",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Vegetable removed successfully")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Vegetable not found",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Vegetable not found")
      *         )

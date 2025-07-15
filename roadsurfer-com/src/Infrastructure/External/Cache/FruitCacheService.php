@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Infrastructure\External\Cache;
 
 use App\Infrastructure\Persistence\Entity\Fruit;
-use Redis;
+use App\Shared\DTO\FruitDTO;
 
 class FruitCacheService
 {
-    private const CACHE_TTL_ALL = 3600; // 1 hour
+    private const CACHE_TTL_ALL    = 3600; // 1 hour
     private const CACHE_TTL_SEARCH = 1800; // 30 minutes
-    private const CACHE_PREFIX = 'fruits:';
+    private const CACHE_PREFIX     = 'fruits:';
 
-    private Redis $redis;
+    private \Redis $redis;
 
-    public function __construct(Redis $redis)
+    public function __construct(\Redis $redis)
     {
         $this->redis = $redis;
         $this->connectRedis();
@@ -23,10 +23,10 @@ class FruitCacheService
 
     private function connectRedis(): void
     {
-        if (! $this->redis->isConnected()) {
-            $host = getenv('REDIS_HOST') ?: 'redis';
-            $port = (int) (getenv('REDIS_PORT') ?: 6379);
-            $database = (int) (getenv('REDIS_DB') ?: 0);
+        if (!$this->redis->isConnected()) {
+            $host     = getenv('REDIS_HOST') ?: 'redis';
+            $port     = (int)(getenv('REDIS_PORT') ?: 6379);
+            $database = (int)(getenv('REDIS_DB') ?: 0);
 
             $this->redis->connect($host, $port);
             $this->redis->select($database);
@@ -34,18 +34,18 @@ class FruitCacheService
     }
 
     /**
-     * @return array|null
+     * @return array<FruitDTO>
      */
-    public function getFruits(): ?array
+    public function getFruits(): array
     {
-        $cacheKey = self::CACHE_PREFIX . 'all';
+        $cacheKey   = self::CACHE_PREFIX . 'all';
         $cachedData = $this->redis->get($cacheKey);
 
-        if ($cachedData === false) {
-            return null;
+        if (false === $cachedData) {
+            return [];
         }
 
-        return json_decode($cachedData, true);
+        return unserialize($cachedData);
     }
 
     /**
@@ -54,21 +54,21 @@ class FruitCacheService
     public function setFruits(array $fruits): void
     {
         $cacheKey = self::CACHE_PREFIX . 'all';
-        $data = $this->serializeFruits($fruits);
+        $data     = $this->serializeFruits($fruits);
 
         $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, $data);
     }
 
     /**
-     * @return array|null
+     * @return array<FruitDTO>
      */
-    public function getFruitsByName(string $searchTerm): ?array
+    public function getFruitsByName(string $name): array
     {
-        $cacheKey = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
+        $cacheKey   = self::CACHE_PREFIX . 'search:' . md5($name);
         $cachedData = $this->redis->get($cacheKey);
 
-        if ($cachedData === false) {
-            return null;
+        if (false === $cachedData) {
+            return [];
         }
 
         return json_decode($cachedData, true);
@@ -80,7 +80,7 @@ class FruitCacheService
     public function setFruitsByName(string $searchTerm, array $fruits): void
     {
         $cacheKey = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
-        $data = $this->serializeFruits($fruits);
+        $data     = $this->serializeFruits($fruits);
 
         $this->redis->setex($cacheKey, self::CACHE_TTL_SEARCH, $data);
     }
@@ -88,9 +88,9 @@ class FruitCacheService
     public function invalidateCache(): void
     {
         $pattern = self::CACHE_PREFIX . '*';
-        $keys = $this->redis->keys($pattern);
+        $keys    = $this->redis->keys($pattern);
 
-        if (! empty($keys)) {
+        if (!empty($keys)) {
             foreach ($keys as $key) {
                 $this->redis->del($key);
             }
@@ -98,24 +98,21 @@ class FruitCacheService
     }
 
     // Methods for management services
-    public function getCachedFruits(?string $search = null): ?array
+    /**
+     * @return array<FruitDTO>
+     */
+    public function getCachedFruits(): array
     {
-        if ($search) {
-            return $this->getFruitsByName($search);
-        }
-
         return $this->getFruits();
     }
 
-    public function cacheFruits(array $fruits, ?string $search = null): void
+    /**
+     * @param array<FruitDTO> $fruits
+     */
+    public function cacheFruits(array $fruits): void
     {
-        if ($search) {
-            $this->setFruitsByName($search, $fruits);
-
-            return;
-        }
-
-        $this->setFruits($fruits);
+        $cacheKey = self::CACHE_PREFIX . 'all';
+        $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, serialize($fruits));
     }
 
     /**
@@ -126,9 +123,9 @@ class FruitCacheService
         $data = [];
         foreach ($fruits as $fruit) {
             $data[] = [
-                'id' => $fruit->getId(),
-                'name' => $fruit->getName(),
-                'quantity' => $fruit->getQuantity(),
+                'id'         => $fruit->getId(),
+                'name'       => $fruit->getName(),
+                'quantity'   => $fruit->getQuantity(),
                 'created_at' => $fruit->getCreatedAt()?->format('c'),
                 'updated_at' => $fruit->getUpdatedAt()?->format('c'),
             ];

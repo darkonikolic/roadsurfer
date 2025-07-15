@@ -9,13 +9,14 @@ use App\Infrastructure\Persistence\Entity\Fruit;
 use App\Infrastructure\Persistence\Entity\FruitRepository;
 use App\Shared\DTO\ApiResponseDTO;
 use App\Shared\DTO\FruitApiRequestDTO;
+use App\Shared\DTO\FruitDTO;
 
 class FruitManagementService
 {
     public function __construct(
         private readonly FruitRepository $fruitRepository,
         private readonly FruitCacheService $fruitCacheService,
-        private readonly UnitConversionService $conversionService
+        private readonly UnitConversionService $conversionService,
     ) {
     }
 
@@ -32,10 +33,10 @@ class FruitManagementService
             $this->fruitCacheService->invalidateCache();
 
             return new ApiResponseDTO(true, 'Fruit added successfully', [
-                'id' => $fruit->getId(),
-                'name' => $fruit->getName(),
+                'id'       => $fruit->getId(),
+                'name'     => $fruit->getName(),
                 'quantity' => $fruit->getQuantity(),
-                'unit' => 'g',
+                'unit'     => 'g',
             ]);
         } catch (\Exception $e) {
             return new ApiResponseDTO(false, 'Failed to add fruit: ' . $e->getMessage());
@@ -47,7 +48,7 @@ class FruitManagementService
         try {
             $fruit = $this->fruitRepository->find($fruitId);
 
-            if (! $fruit) {
+            if (!$fruit) {
                 return new ApiResponseDTO(false, 'Fruit not found');
             }
 
@@ -60,27 +61,36 @@ class FruitManagementService
         }
     }
 
-    public function listFruits(?string $search = null, ?string $unit = 'g'): ApiResponseDTO
+    public function listFruits(?string $unit = 'g'): ApiResponseDTO
     {
         try {
-            $fruits = $this->fruitCacheService->getCachedFruits($search);
+            $fruits = $this->fruitCacheService->getCachedFruits();
 
-            if ($fruits === null) {
-                $fruits = $this->fruitRepository->findBySearch($search);
-                $this->fruitCacheService->cacheFruits($fruits, $search);
+            if (empty($fruits)) {
+                $fruits    = $this->fruitRepository->findAll();
+                $fruitDTOs = array_map(function ($fruit) {
+                    return new FruitDTO(
+                        $fruit->getId(),
+                        $fruit->getName(),
+                        (float)$fruit->getQuantity(),
+                        'kg'
+                    );
+                }, $fruits);
+                $this->fruitCacheService->cacheFruits($fruitDTOs);
+                $fruits = $fruitDTOs;
             }
 
-            $data = array_map(function (Fruit $fruit) use ($unit) {
-                $quantity = $fruit->getQuantity();
-                if ($unit === 'kg') {
+            $data = array_map(function (FruitDTO $fruit) use ($unit) {
+                $quantity = $fruit->quantity;
+                if ('kg' === $unit) {
                     $quantity = $this->conversionService->convertToKilograms($quantity);
                 }
 
                 return [
-                    'id' => $fruit->getId(),
-                    'name' => $fruit->getName(),
+                    'id'       => $fruit->productId,
+                    'name'     => $fruit->name,
                     'quantity' => $quantity,
-                    'unit' => $unit,
+                    'unit'     => $unit,
                 ];
             }, $fruits);
 
