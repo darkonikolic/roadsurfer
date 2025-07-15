@@ -17,21 +17,5 @@ doctrine:
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Infrastructure/Persistence/Entity'
                 prefix: 'App\Infrastructure\Persistence\Entity'
-                alias: App 
-        # Performance optimizations for test environment
-        result_cache_driver:
-            type: pool
-            pool: doctrine.result_cache_pool
-        query_cache_driver:
-            type: pool
-            pool: doctrine.system_cache_pool
-
-framework:
-    cache:
-        pools:
-            doctrine.result_cache_pool:
-                adapter: cache.app
-                default_lifetime: 3600
-            doctrine.system_cache_pool:
-                adapter: cache.system
-                default_lifetime: 3600 
+                alias: App
+        # Cache disabled - using custom cache services for specific entities 

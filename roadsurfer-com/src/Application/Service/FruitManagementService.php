@@ -6,7 +6,7 @@ namespace App\Application\Service;
 
 use App\Infrastructure\External\Cache\FruitCacheService;
 use App\Infrastructure\Persistence\Entity\Fruit;
-use App\Infrastructure\Persistence\Entity\FruitRepository;
+use App\Infrastructure\Persistence\Repository\FruitRepository;
 use App\Shared\DTO\ApiResponseDTO;
 use App\Shared\DTO\FruitApiRequestDTO;
 use App\Shared\DTO\FruitDTO;
@@ -29,7 +29,8 @@ class FruitManagementService
             $fruit->setName($request->name);
             $fruit->setQuantity($quantityInGrams);
 
-            $this->fruitRepository->saveAndFlush($fruit);
+            $this->fruitRepository->persist($fruit);
+            $this->fruitRepository->flush();
             $this->fruitCacheService->invalidateCache();
 
             return new ApiResponseDTO(true, 'Fruit added successfully', [
@@ -52,7 +53,8 @@ class FruitManagementService
                 return new ApiResponseDTO(false, 'Fruit not found');
             }
 
-            $this->fruitRepository->removeAndFlush($fruit);
+            $this->fruitRepository->remove($fruit);
+            $this->fruitRepository->flush();
             $this->fruitCacheService->invalidateCache();
 
             return new ApiResponseDTO(true, 'Fruit removed successfully');
@@ -64,31 +66,17 @@ class FruitManagementService
     public function listFruits(?string $unit = 'g'): ApiResponseDTO
     {
         try {
-            $fruits = $this->fruitCacheService->getCachedFruits();
+            $fruits = $this->fruitCacheService->findAll();
 
-            if (empty($fruits)) {
-                $fruits    = $this->fruitRepository->findAll();
-                $fruitDTOs = array_map(function ($fruit) {
-                    return new FruitDTO(
-                        $fruit->getId(),
-                        $fruit->getName(),
-                        (float)$fruit->getQuantity(),
-                        'kg'
-                    );
-                }, $fruits);
-                $this->fruitCacheService->cacheFruits($fruitDTOs);
-                $fruits = $fruitDTOs;
-            }
-
-            $data = array_map(function (FruitDTO $fruit) use ($unit) {
-                $quantity = $fruit->quantity;
+            $data = array_map(function (Fruit $fruit) use ($unit) {
+                $quantity = $fruit->getQuantity();
                 if ('kg' === $unit) {
                     $quantity = $this->conversionService->convertToKilograms($quantity);
                 }
 
                 return [
-                    'id'       => $fruit->productId,
-                    'name'     => $fruit->name,
+                    'id'       => $fruit->getId(),
+                    'name'     => $fruit->getName(),
                     'quantity' => $quantity,
                     'unit'     => $unit,
                 ];

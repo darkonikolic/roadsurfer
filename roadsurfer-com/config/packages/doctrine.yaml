@@ -17,48 +17,10 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Infrastructure/Persistence/Entity'
                 prefix: 'App\Infrastructure\Persistence\Entity'
                 alias: App
-        # Performance optimizations
-        result_cache_driver:
-            type: pool
-            pool: doctrine.result_cache_pool
-        query_cache_driver:
-            type: pool
-            pool: doctrine.system_cache_pool
-
-when@dev:
-    framework:
-        cache:
-            pools:
-                doctrine.result_cache_pool:
-                    adapter: cache.app
-                    default_lifetime: 3600
-                doctrine.system_cache_pool:
-                    adapter: cache.system
-                    default_lifetime: 3600
-
-when@test:
-    doctrine:
-        dbal:
-            url: '%env(resolve:TEST_DATABASE_URL)%'
+        # Cache disabled - using custom cache services for specific entities
 
 when@prod:
     doctrine:
         orm:
             auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
-            query_cache_driver:
-                type: pool
-                pool: doctrine.system_cache_pool
-            result_cache_driver:
-                type: pool
-                pool: doctrine.result_cache_pool
-
-    framework:
-        cache:
-            pools:
-                doctrine.result_cache_pool:
-                    adapter: cache.app
-                    default_lifetime: 3600
-                doctrine.system_cache_pool:
-                    adapter: cache.system
-                    default_lifetime: 3600

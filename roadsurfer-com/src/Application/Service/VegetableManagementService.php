@@ -6,7 +6,7 @@ namespace App\Application\Service;
 
 use App\Infrastructure\External\Cache\VegetableCacheService;
 use App\Infrastructure\Persistence\Entity\Vegetable;
-use App\Infrastructure\Persistence\Entity\VegetableRepository;
+use App\Infrastructure\Persistence\Repository\VegetableRepository;
 use App\Shared\DTO\ApiResponseDTO;
 use App\Shared\DTO\VegetableApiRequestDTO;
 use App\Shared\DTO\VegetableDTO;
@@ -29,7 +29,8 @@ class VegetableManagementService
             $vegetable->setName($request->name);
             $vegetable->setQuantity($quantityInGrams);
 
-            $this->vegetableRepository->saveAndFlush($vegetable);
+            $this->vegetableRepository->persist($vegetable);
+            $this->vegetableRepository->flush();
             $this->vegetableCacheService->invalidateCache();
 
             return new ApiResponseDTO(true, 'Vegetable added successfully', [
@@ -52,7 +53,8 @@ class VegetableManagementService
                 return new ApiResponseDTO(false, 'Vegetable not found');
             }
 
-            $this->vegetableRepository->removeAndFlush($vegetable);
+            $this->vegetableRepository->remove($vegetable);
+            $this->vegetableRepository->flush();
             $this->vegetableCacheService->invalidateCache();
 
             return new ApiResponseDTO(true, 'Vegetable removed successfully');
@@ -64,31 +66,17 @@ class VegetableManagementService
     public function listVegetables(?string $unit = 'g'): ApiResponseDTO
     {
         try {
-            $vegetables = $this->vegetableCacheService->getCachedVegetables();
+            $vegetables = $this->vegetableCacheService->findAll();
 
-            if (empty($vegetables)) {
-                $vegetables    = $this->vegetableRepository->findAll();
-                $vegetableDTOs = array_map(function ($vegetable) {
-                    return new VegetableDTO(
-                        $vegetable->getId(),
-                        $vegetable->getName(),
-                        (float)$vegetable->getQuantity(),
-                        'kg'
-                    );
-                }, $vegetables);
-                $this->vegetableCacheService->cacheVegetables($vegetableDTOs);
-                $vegetables = $vegetableDTOs;
-            }
-
-            $data = array_map(function (VegetableDTO $vegetable) use ($unit) {
-                $quantity = $vegetable->quantity;
+            $data = array_map(function (Vegetable $vegetable) use ($unit) {
+                $quantity = $vegetable->getQuantity();
                 if ('kg' === $unit) {
                     $quantity = $this->conversionService->convertToKilograms($quantity);
                 }
 
                 return [
-                    'id'       => $vegetable->productId,
-                    'name'     => $vegetable->name,
+                    'id'       => $vegetable->getId(),
+                    'name'     => $vegetable->getName(),
                     'quantity' => $quantity,
                     'unit'     => $unit,
                 ];

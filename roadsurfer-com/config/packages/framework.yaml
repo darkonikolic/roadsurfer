@@ -4,12 +4,6 @@ framework:
     #csrf_protection: true
     http_method_override: false
 
-    # Performance optimizations
-    cache:
-        app: cache.adapter.filesystem
-        system: cache.adapter.system
-        directory: '%kernel.cache_dir%/pools'
-
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
@@ -30,20 +24,8 @@ when@dev:
             log: false
             throw: false
 
-when@test:
-    framework:
-        test: true
-        session:
-            storage_factory_id: session.storage.factory.mock_file
-        php_errors:
-            log: false
-            throw: false
-
 when@prod:
     framework:
-        cache:
-            app: cache.adapter.redis
-            default_redis_provider: redis://localhost
         http_client:
             default_options:
                 extra:

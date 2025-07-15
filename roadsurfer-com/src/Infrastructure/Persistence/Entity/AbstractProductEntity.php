@@ -97,4 +97,20 @@ abstract class AbstractProductEntity
     {
         $this->updatedAt = new DateTime();
     }
+
+    /**
+     * Get entity data as array for JSON serialization
+     *
+     * @return array<string, mixed>
+     */
+    public function getArray(): array
+    {
+        return [
+            'id'         => $this->id,
+            'name'       => $this->name,
+            'quantity'   => $this->quantity,
+            'created_at' => $this->createdAt?->format('c'),
+            'updated_at' => $this->updatedAt?->format('c'),
+        ];
+    }
 }

@@ -220,6 +220,18 @@ test: ## 🧪 Run all tests
 	$(PHPUNIT)
 	@echo "$(GREEN)✅ Tests are completed!$(NC)"
 
+.PHONY: test-unit
+test-unit: ## 🧪 Run unit tests only
+	@echo "$(GREEN)🧪 Running unit tests...$(NC)"
+	$(PHPUNIT) --testsuite="Unit Tests"
+	@echo "$(GREEN)✅ Unit tests are completed!$(NC)"
+
+.PHONY: test-integration
+test-integration: ## 🧪 Run integration tests only
+	@echo "$(GREEN)🧪 Running integration tests...$(NC)"
+	$(PHPUNIT) --testsuite="Integration Tests"
+	@echo "$(GREEN)✅ Integration tests are completed!$(NC)"
+
 .PHONY: test-coverage
 test-coverage: ## 🧪 Run tests with coverage report
 	@echo "$(GREEN)🧪 Running tests with coverage...$(NC)"

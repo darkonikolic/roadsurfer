@@ -27,13 +27,4 @@ when@dev:
                 level: warning
                 channels: ["!event", "!deprecation"]
             deprecation:
-                level: error
-
-when@test:
-    monolog:
-        handlers:
-            main:
-                level: warning
-                channels: ["!event", "!deprecation"]
-            deprecation:
                 level: error 

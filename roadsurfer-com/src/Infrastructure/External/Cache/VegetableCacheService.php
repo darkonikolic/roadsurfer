@@ -5,132 +5,140 @@ declare(strict_types=1);
 namespace App\Infrastructure\External\Cache;
 
 use App\Infrastructure\Persistence\Entity\Vegetable;
+use App\Infrastructure\Persistence\Repository\VegetableRepository;
 use App\Shared\DTO\VegetableDTO;
+use DateTime;
+use Redis;
 
-class VegetableCacheService
+class VegetableCacheService extends AbstractCacheService
 {
-    private const CACHE_TTL_ALL    = 3600; // 1 hour
-    private const CACHE_TTL_SEARCH = 1800; // 30 minutes
-    private const CACHE_PREFIX     = 'vegetables:';
+    private VegetableRepository $vegetableRepository;
 
-    private \Redis $redis;
-
-    public function __construct(\Redis $redis)
+    public function __construct(Redis $redis, VegetableRepository $vegetableRepository, int $cacheTtl = 1)
     {
-        $this->redis = $redis;
-        $this->connectRedis();
-    }
-
-    private function connectRedis(): void
-    {
-        if (!$this->redis->isConnected()) {
-            $host     = getenv('REDIS_HOST') ?: 'redis';
-            $port     = (int)(getenv('REDIS_PORT') ?: 6379);
-            $database = (int)(getenv('REDIS_DB') ?: 0);
-
-            $this->redis->connect($host, $port);
-            $this->redis->select($database);
-        }
+        parent::__construct($redis, $cacheTtl);
+        $this->vegetableRepository = $vegetableRepository;
     }
 
     /**
+     * Get all vegetables (with cache fallback to repository)
+     * 
+     * @return array<Vegetable>
+     */
+    public function findAll(): array
+    {
+        $cached = $this->read(['vegetable', 'all']);
+        
+        if (empty($cached)) {
+            $vegetables = $this->vegetableRepository->findAll();
+            $this->save(['vegetable', 'all'], $this->convertToDTOs($vegetables));
+            return $vegetables;
+        }
+        
+        return $this->hydrateFromCache($cached);
+    }
+
+    /**
+     * Find vegetables by name (with cache fallback to repository)
+     * 
+     * @param string $name
+     *
+     * @return array<Vegetable>
+     */
+    public function findByName(string $name): array
+    {
+        $cached = $this->read(['vegetable', 'name', $name]);
+        
+        if (empty($cached)) {
+            $vegetables = $this->vegetableRepository->findByName($name);
+            $this->save(['vegetable', 'name', $name], $this->convertToDTOs($vegetables));
+            return $vegetables;
+        }
+        
+        return $this->hydrateFromCache($cached);
+    }
+
+    /**
+     * Convert Vegetable entities to VegetableDTOs
+     * 
+     * @param array<Vegetable> $vegetables
+     *
      * @return array<VegetableDTO>
      */
-    public function getVegetables(): array
+    private function convertToDTOs(array $vegetables): array
     {
-        $cacheKey   = self::CACHE_PREFIX . 'all';
-        $cachedData = $this->redis->get($cacheKey);
-
-        if (false === $cachedData) {
-            return [];
-        }
-
-        return unserialize($cachedData);
-    }
-
-    /**
-     * @param Vegetable[] $vegetables
-     */
-    public function setVegetables(array $vegetables): void
-    {
-        $cacheKey = self::CACHE_PREFIX . 'all';
-        $data     = $this->serializeVegetables($vegetables);
-
-        $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, $data);
-    }
-
-    /**
-     * @return array<VegetableDTO>
-     */
-    public function getVegetablesByName(string $searchTerm): array
-    {
-        $cacheKey   = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
-        $cachedData = $this->redis->get($cacheKey);
-
-        if (false === $cachedData) {
-            return [];
-        }
-
-        return unserialize($cachedData);
-    }
-
-    /**
-     * @param Vegetable[] $vegetables
-     */
-    public function setVegetablesByName(string $searchTerm, array $vegetables): void
-    {
-        $cacheKey = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
-        $data     = $this->serializeVegetables($vegetables);
-
-        $this->redis->setex($cacheKey, self::CACHE_TTL_SEARCH, $data);
-    }
-
-    public function invalidateCache(): void
-    {
-        $pattern = self::CACHE_PREFIX . '*';
-        $keys    = $this->redis->keys($pattern);
-
-        if (!empty($keys)) {
-            foreach ($keys as $key) {
-                $this->redis->del($key);
-            }
-        }
-    }
-
-    // Methods for management services
-    /**
-     * @return array<VegetableDTO>
-     */
-    public function getCachedVegetables(): array
-    {
-        return $this->getVegetables();
-    }
-
-    /**
-     * @param array<VegetableDTO> $vegetables
-     */
-    public function cacheVegetables(array $vegetables): void
-    {
-        $cacheKey = self::CACHE_PREFIX . 'all';
-        $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, serialize($vegetables));
-    }
-
-    /**
-     * @param Vegetable[] $vegetables
-     */
-    private function serializeVegetables(array $vegetables): string
-    {
-        $data = [];
+        $dtos = [];
         foreach ($vegetables as $vegetable) {
-            $data[] = [
-                'id'         => $vegetable->getId(),
-                'name'       => $vegetable->getName(),
-                'quantity'   => $vegetable->getQuantity(),
-                'created_at' => $vegetable->getCreatedAt()?->format('c'),
-                'updated_at' => $vegetable->getUpdatedAt()?->format('c'),
-            ];
+            $dto = new VegetableDTO(
+                $vegetable->getId(),
+                $vegetable->getName(),
+                $vegetable->getQuantity(),
+                'kg' // Default unit
+            );
+            $dtos[] = $dto;
         }
+        return $dtos;
+    }
 
-        return json_encode($data);
+    /**
+     * Hydrate cached data back to Vegetable entities
+     * 
+     * @param array<array<string, mixed>> $cachedData
+     *
+     * @return array<Vegetable>
+     */
+    private function hydrateFromCache(array $cachedData): array
+    {
+        $vegetables = [];
+        foreach ($cachedData as $data) {
+            $vegetable = new Vegetable();
+            $vegetable->setId($data['id']);
+            $vegetable->setName($data['name']);
+            $vegetable->setQuantity($data['quantity']);
+            if (isset($data['created_at'])) {
+                $vegetable->setCreatedAt(new DateTime($data['created_at']));
+            }
+            if (isset($data['updated_at'])) {
+                $vegetable->setUpdatedAt(new DateTime($data['updated_at']));
+            }
+            $vegetables[] = $vegetable;
+        }
+        return $vegetables;
+    }
+
+    /**
+     * Get cache prefix
+     */
+    protected function getCachePrefix(): string
+    {
+        return 'vegetables:';
+    }
+
+    /**
+     * Check if item is valid DTO
+     * 
+     * @param mixed $item
+     */
+    protected function isValidDTO($item): bool
+    {
+        return $item instanceof VegetableDTO;
+    }
+
+    /**
+     * Convert DTO to array
+     * 
+     * @param mixed $item
+     *
+     * @return array<string, mixed>
+     */
+    protected function convertDTOToArray($item): array
+    {
+        return [
+            'id'         => $item->productId,
+            'name'       => $item->name,
+            'quantity'   => $item->quantity,
+            'created_at' => null, // DTO doesn't have timestamps
+            'updated_at' => null,
+        ];
     }
 }

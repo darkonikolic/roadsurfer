@@ -10,6 +10,11 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Fruit>
+ *
+ * @method Fruit|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Fruit|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Fruit[] findAll()
+ * @method Fruit[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class FruitRepository extends ServiceEntityRepository
 {
@@ -24,8 +29,7 @@ class FruitRepository extends ServiceEntityRepository
     public function findAll(): array
     {
         return $this->createQueryBuilder('f')
-            ->select('f')
-            ->from(Fruit::class, 'f')
+            ->orderBy('f.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -36,38 +40,25 @@ class FruitRepository extends ServiceEntityRepository
     public function findByName(string $name): array
     {
         return $this->createQueryBuilder('f')
-            ->select('f')
-            ->from(Fruit::class, 'f')
             ->where('f.name LIKE :name')
             ->setParameter('name', '%' . $name . '%')
+            ->orderBy('f.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
-    /**
-     * @return Fruit[]
-     */
-    public function findByQuantityRange(float $minQuantity, float $maxQuantity): array
-    {
-        return $this->createQueryBuilder('f')
-            ->select('f')
-            ->from(Fruit::class, 'f')
-            ->where('f.quantity BETWEEN :minQuantity AND :maxQuantity')
-            ->setParameter('minQuantity', $minQuantity)
-            ->setParameter('maxQuantity', $maxQuantity)
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function save(Fruit $fruit): void
+    public function persist(Fruit $fruit): void
     {
         $this->_em->persist($fruit);
-        $this->_em->flush();
     }
 
     public function remove(Fruit $fruit): void
     {
         $this->_em->remove($fruit);
+    }
+
+    public function flush(): void
+    {
         $this->_em->flush();
     }
 }

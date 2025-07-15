@@ -38,14 +38,30 @@ services:
         arguments:
             $redis: '@Redis'
 
-    # Cache Services - These are now autowired with the Redis service
-
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Cache Services
+    App\Infrastructure\External\Cache\FruitCacheService:
+        arguments:
+            $redis: '@Redis'
+            $fruitRepository: '@App\Infrastructure\Persistence\Repository\FruitRepository'
+            $cacheTtl: '%env(CACHE_TTL)%'
+    
+    App\Infrastructure\External\Cache\VegetableCacheService:
+        arguments:
+            $redis: '@Redis'
+            $vegetableRepository: '@App\Infrastructure\Persistence\Repository\VegetableRepository'
+            $cacheTtl: '%env(CACHE_TTL)%'
 
     # Redis service configuration
     Redis:
         class: Redis
         lazy: true
+        calls:
+            - method: connect
+              arguments:
+                  - '%env(REDIS_HOST)%'
+                  - '%env(REDIS_PORT)%'
+            - method: select
+              arguments:
+                  - '%env(REDIS_DB)%'
 
 

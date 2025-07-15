@@ -1,0 +1,27 @@
+# Test services configuration
+services:
+    # Override Redis service for test environment
+    Redis:
+        class: Redis
+        lazy: true
+        calls:
+            - method: connect
+              arguments:
+                  - '%env(REDIS_HOST)%'
+                  - '%env(REDIS_PORT)%'
+            - method: select
+              arguments:
+                  - '%env(REDIS_TEST_DB)%'
+    
+    # Cache Services for test environment
+    App\Infrastructure\External\Cache\FruitCacheService:
+        arguments:
+            $redis: '@Redis'
+            $fruitRepository: '@App\Infrastructure\Persistence\Repository\FruitRepository'
+            $cacheTtl: '%env(CACHE_TTL)%'
+    
+    App\Infrastructure\External\Cache\VegetableCacheService:
+        arguments:
+            $redis: '@Redis'
+            $vegetableRepository: '@App\Infrastructure\Persistence\Repository\VegetableRepository'
+            $cacheTtl: '%env(CACHE_TTL)%' 

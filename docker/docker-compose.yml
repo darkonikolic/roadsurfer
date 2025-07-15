@@ -18,6 +18,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - REDIS_TEST_DB=1
+      - CACHE_TTL=1
       - APP_SECRET=your_secret_key_here_change_this_in_production
       - TEST_APP_ENV=test
       - TEST_APP_SECRET=test_secret_key_for_testing_environment
@@ -69,21 +71,39 @@ services:
     networks:
       - roadster_network
 
-  # PHPMyAdmin (Optional)
+  # PHPMyAdmin - Database Management
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
     container_name: roadster_phpmyadmin
     environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
     ports:
       - "8081:80"
-    networks:
-      - roadster_network
     depends_on:
       - mysql
+    networks:
+      - roadster_network
+
+  # Redis Commander - Web GUI for Redis Management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: roadster_redis_commander
+    environment:
+      - REDIS_HOSTS=dev:redis:6379:1,test:redis:6379:0
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin123
+      - WEB_USER=admin
+      - WEB_PASSWORD=admin123
+    ports:
+      - "8082:8081"
+    depends_on:
+      - redis
+    networks:
+      - roadster_network
 
 volumes:
   mysql_data:

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Infrastructure;
+namespace App\Tests\Integration\Infrastructure\External;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;

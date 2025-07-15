@@ -45,6 +45,7 @@
 - **Main Application:** http://localhost:8080
 - **API Documentation:** http://localhost:8080/api/doc
 - **PHPMyAdmin:** http://localhost:8081
+- **Redis Commander:** http://localhost:8082 (admin/admin123)
 - **Health Check:** http://localhost:8080/health
 
 ### Development Commands

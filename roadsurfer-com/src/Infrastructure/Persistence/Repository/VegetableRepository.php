@@ -24,8 +24,6 @@ class VegetableRepository extends ServiceEntityRepository
     public function findAll(): array
     {
         return $this->createQueryBuilder('v')
-            ->select('v')
-            ->from(Vegetable::class, 'v')
             ->getQuery()
             ->getResult();
     }
@@ -36,38 +34,24 @@ class VegetableRepository extends ServiceEntityRepository
     public function findByName(string $name): array
     {
         return $this->createQueryBuilder('v')
-            ->select('v')
-            ->from(Vegetable::class, 'v')
             ->where('v.name LIKE :name')
             ->setParameter('name', '%' . $name . '%')
             ->getQuery()
             ->getResult();
     }
 
-    /**
-     * @return Vegetable[]
-     */
-    public function findByQuantityRange(float $minQuantity, float $maxQuantity): array
-    {
-        return $this->createQueryBuilder('v')
-            ->select('v')
-            ->from(Vegetable::class, 'v')
-            ->where('v.quantity BETWEEN :minQuantity AND :maxQuantity')
-            ->setParameter('minQuantity', $minQuantity)
-            ->setParameter('maxQuantity', $maxQuantity)
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function save(Vegetable $vegetable): void
+    public function persist(Vegetable $vegetable): void
     {
         $this->_em->persist($vegetable);
-        $this->_em->flush();
     }
 
     public function remove(Vegetable $vegetable): void
     {
         $this->_em->remove($vegetable);
+    }
+
+    public function flush(): void
+    {
         $this->_em->flush();
     }
 }

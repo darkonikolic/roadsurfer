@@ -5,132 +5,140 @@ declare(strict_types=1);
 namespace App\Infrastructure\External\Cache;
 
 use App\Infrastructure\Persistence\Entity\Fruit;
+use App\Infrastructure\Persistence\Repository\FruitRepository;
 use App\Shared\DTO\FruitDTO;
+use DateTime;
+use Redis;
 
-class FruitCacheService
+class FruitCacheService extends AbstractCacheService
 {
-    private const CACHE_TTL_ALL    = 3600; // 1 hour
-    private const CACHE_TTL_SEARCH = 1800; // 30 minutes
-    private const CACHE_PREFIX     = 'fruits:';
+    private FruitRepository $fruitRepository;
 
-    private \Redis $redis;
-
-    public function __construct(\Redis $redis)
+    public function __construct(Redis $redis, FruitRepository $fruitRepository, int $cacheTtl = 1)
     {
-        $this->redis = $redis;
-        $this->connectRedis();
-    }
-
-    private function connectRedis(): void
-    {
-        if (!$this->redis->isConnected()) {
-            $host     = getenv('REDIS_HOST') ?: 'redis';
-            $port     = (int)(getenv('REDIS_PORT') ?: 6379);
-            $database = (int)(getenv('REDIS_DB') ?: 0);
-
-            $this->redis->connect($host, $port);
-            $this->redis->select($database);
-        }
+        parent::__construct($redis, $cacheTtl);
+        $this->fruitRepository = $fruitRepository;
     }
 
     /**
+     * Get all fruits (with cache fallback to repository)
+     * 
+     * @return array<Fruit>
+     */
+    public function findAll(): array
+    {
+        $cached = $this->read(['fruit', 'all']);
+        
+        if (empty($cached)) {
+            $fruits = $this->fruitRepository->findAll();
+            $this->save(['fruit', 'all'], $this->convertToDTOs($fruits));
+            return $fruits;
+        }
+        
+        return $this->hydrateFromCache($cached);
+    }
+
+    /**
+     * Find fruits by name (with cache fallback to repository)
+     * 
+     * @param string $name
+     *
+     * @return array<Fruit>
+     */
+    public function findByName(string $name): array
+    {
+        $cached = $this->read(['fruit', 'name', $name]);
+        
+        if (empty($cached)) {
+            $fruits = $this->fruitRepository->findByName($name);
+            $this->save(['fruit', 'name', $name], $this->convertToDTOs($fruits));
+            return $fruits;
+        }
+        
+        return $this->hydrateFromCache($cached);
+    }
+
+    /**
+     * Convert Fruit entities to FruitDTOs
+     * 
+     * @param array<Fruit> $fruits
+     *
      * @return array<FruitDTO>
      */
-    public function getFruits(): array
+    private function convertToDTOs(array $fruits): array
     {
-        $cacheKey   = self::CACHE_PREFIX . 'all';
-        $cachedData = $this->redis->get($cacheKey);
-
-        if (false === $cachedData) {
-            return [];
-        }
-
-        return unserialize($cachedData);
-    }
-
-    /**
-     * @param Fruit[] $fruits
-     */
-    public function setFruits(array $fruits): void
-    {
-        $cacheKey = self::CACHE_PREFIX . 'all';
-        $data     = $this->serializeFruits($fruits);
-
-        $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, $data);
-    }
-
-    /**
-     * @return array<FruitDTO>
-     */
-    public function getFruitsByName(string $name): array
-    {
-        $cacheKey   = self::CACHE_PREFIX . 'search:' . md5($name);
-        $cachedData = $this->redis->get($cacheKey);
-
-        if (false === $cachedData) {
-            return [];
-        }
-
-        return json_decode($cachedData, true);
-    }
-
-    /**
-     * @param Fruit[] $fruits
-     */
-    public function setFruitsByName(string $searchTerm, array $fruits): void
-    {
-        $cacheKey = self::CACHE_PREFIX . 'search:' . md5($searchTerm);
-        $data     = $this->serializeFruits($fruits);
-
-        $this->redis->setex($cacheKey, self::CACHE_TTL_SEARCH, $data);
-    }
-
-    public function invalidateCache(): void
-    {
-        $pattern = self::CACHE_PREFIX . '*';
-        $keys    = $this->redis->keys($pattern);
-
-        if (!empty($keys)) {
-            foreach ($keys as $key) {
-                $this->redis->del($key);
-            }
-        }
-    }
-
-    // Methods for management services
-    /**
-     * @return array<FruitDTO>
-     */
-    public function getCachedFruits(): array
-    {
-        return $this->getFruits();
-    }
-
-    /**
-     * @param array<FruitDTO> $fruits
-     */
-    public function cacheFruits(array $fruits): void
-    {
-        $cacheKey = self::CACHE_PREFIX . 'all';
-        $this->redis->setex($cacheKey, self::CACHE_TTL_ALL, serialize($fruits));
-    }
-
-    /**
-     * @param Fruit[] $fruits
-     */
-    private function serializeFruits(array $fruits): string
-    {
-        $data = [];
+        $dtos = [];
         foreach ($fruits as $fruit) {
-            $data[] = [
-                'id'         => $fruit->getId(),
-                'name'       => $fruit->getName(),
-                'quantity'   => $fruit->getQuantity(),
-                'created_at' => $fruit->getCreatedAt()?->format('c'),
-                'updated_at' => $fruit->getUpdatedAt()?->format('c'),
-            ];
+            $dto = new FruitDTO(
+                $fruit->getId(),
+                $fruit->getName(),
+                $fruit->getQuantity(),
+                'kg' // Default unit
+            );
+            $dtos[] = $dto;
         }
+        return $dtos;
+    }
 
-        return json_encode($data);
+    /**
+     * Hydrate cached data back to Fruit entities
+     * 
+     * @param array<array<string, mixed>> $cachedData
+     *
+     * @return array<Fruit>
+     */
+    private function hydrateFromCache(array $cachedData): array
+    {
+        $fruits = [];
+        foreach ($cachedData as $data) {
+            $fruit = new Fruit();
+            $fruit->setId($data['id']);
+            $fruit->setName($data['name']);
+            $fruit->setQuantity($data['quantity']);
+            if (isset($data['created_at'])) {
+                $fruit->setCreatedAt(new DateTime($data['created_at']));
+            }
+            if (isset($data['updated_at'])) {
+                $fruit->setUpdatedAt(new DateTime($data['updated_at']));
+            }
+            $fruits[] = $fruit;
+        }
+        return $fruits;
+    }
+
+    /**
+     * Get cache prefix
+     */
+    protected function getCachePrefix(): string
+    {
+        return 'fruits:';
+    }
+
+    /**
+     * Check if item is valid DTO
+     * 
+     * @param mixed $item
+     */
+    protected function isValidDTO($item): bool
+    {
+        return $item instanceof FruitDTO;
+    }
+
+    /**
+     * Convert DTO to array
+     * 
+     * @param mixed $item
+     *
+     * @return array<string, mixed>
+     */
+    protected function convertDTOToArray($item): array
+    {
+        return [
+            'id'         => $item->productId,
+            'name'       => $item->name,
+            'quantity'   => $item->quantity,
+            'created_at' => null, // DTO doesn't have timestamps
+            'updated_at' => null,
+        ];
     }
 }

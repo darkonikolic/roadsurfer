@@ -26,8 +26,8 @@ Build a service that:
 | 7 | API Documentation | [#bonus] | 0.5 hours |
 | 8 | Integration & E2E Testing | [#bonus] | 1 hour |
 
-**MVP Requirements:** Phases 1, 2, 2.5, 3, 5, 6 (5 hours total) - **3.5/5 COMPLETED**
-**Optional Enhancements:** Phases 4, 7, 8 (2 hours additional) - **1/3 COMPLETED**
+**MVP Requirements:** Phases 1, 2, 2.5, 3, 5, 6 (5 hours total) - **5/6 COMPLETED**
+**Optional Enhancements:** Phases 4, 7, 8 (2 hours additional) - **2/3 COMPLETED**
 
 ## 💡 **MAJOR FOCUS: Development Principles & Constraints**
 * **KISS, DRY, YAGNI, SOLID principles** - Keep it simple, avoid duplication, don't over-engineer
@@ -190,7 +190,7 @@ Build a service that:
 - [x] Implement JSON processing service with 100% test coverage
 - [x] Implement unit conversion service (kg to g)
 - [x] Implement product splitting service
-- [x] Create console command for processing request.json with custom path support
+- [ ] Create console command for processing request.json with custom path support
 - [x] Create separate database tables for fruits and vegetables
 - [x] Implement Redis caching for search results with invalidation
 - [x] Create REST API endpoints with validation
@@ -237,4 +237,4 @@ Build a service that:
 - **Timebox**: Complete implementation within 3-4 hours, prioritize essential features
 - **Integration Testing**: Test real database operations via repository, validate HTTP responses
 - **Backward Compatibility**: Maintain functionality during Symfony upgrade
-- **Test Strategy**: Focus on integration tests that cover complete workflow from HTTP to database 
+- [ ] Test Strategy: Focus on integration tests that cover complete workflow from HTTP to database 

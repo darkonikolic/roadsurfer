@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Infrastructure;
+namespace App\Tests\Integration\Infrastructure\External\Health;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
